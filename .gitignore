@@ -1,0 +1,55 @@
+# --- Python / Backend ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.env
+.env.local
+.env.*.local
+.python-version
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.db
+*.sqlite3
+
+# --- Alembic (Migrations) ---
+# Opcional: Si no quieres ignorar las versiones, no incluyas esta línea.
+# Normalmente las versiones se suben, pero los archivos de log no.
+alembic.log
+
+# --- Frontend (React / Vite / TS) ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+.stylelintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- Infrastructure / Docker ---
+.docker/
+# Ignorar volúmenes de datos locales de Postgres
+postgres_data/
+
+# --- IDEs / Editors ---
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Project Specific ---
+# Ignorar la carpeta de datos locales si se usa para pruebas
+data/
+*.log
