@@ -34,6 +34,28 @@
 - [x] Decision to use SQLModel instead of SQLAlchemy.
 - [x] **US-01 User Registration:** Full set of 8 governance files completed (Spec, Data-Model, Plan, Tasks, etc.).
 - [x] **IDE Config:** `ANTIGRAVITY.md` created for context persistence.
+- [x] **Infrastructure:** Docker Compose launched successfully (db, api, web).
+
+## [2026-05-14] - Docker Infrastructure & Environment Setup
+
+**Status**: Infrastructure Verified.
+
+### Accomplishments:
+- **Docker Orchestration**: Successfully launched `db`, `api`, and `web` containers using `docker-compose.yml`.
+- **Environment Parity**: Verified that PostgreSQL is healthy and Vite dev server is running in the `web` container.
+- **Backend Environment**: Configured `api` container with `tail -f /dev/null` to allow interactive development and TDD execution.
+
+### Decisions & Observations:
+- **Dependency Management**: Shifted to `requirements.txt` for Docker builds. Need to restore `pyproject.toml` for standardized tool configuration.
+
+### Next Steps:
+- Execute Phase 2 (Foundational) of `tasks.md`:
+    - T004: Setup Database engine and Session utilities.
+    - T005: Implement JWT Utility service.
+    - T006: Implement Password Hashing utility.
+    - T007: Create Base `User` and `Role` Enums in `models.py`.
+
+---
 
 ## [2026-04-29] - User Registration Governance Phase
 
@@ -47,12 +69,3 @@
 - **Execution Roadmap**: Created a detailed TDD-based task list (`tasks.md`) to guide the implementation phase.
 - **Operational Readiness**: Delivered a Docker-centric guide (`quickstart.md`) for bootstrapping and validating the module.
 - **Quality Assurance**: Initialized the specification checklist (`checklist.md`) and the foundational data model entities (`data-model.md` - Part 1).
-
-### Decisions:
-- Adopted **SQLModel** as the bridge between Pydantic and SQLAlchemy to minimize boilerplate while maintaining type safety.
-- Enforced **Synchronous Audit Logging** for all registration events to comply with transparency requirements.
-- Selected **Docker Compose exec** as the primary method for running migrations and tests to ensure environment parity.
-
-### Next Steps:
-- Complete the remaining sections of `data-model.md` (Pydantic validation & Audit entities).
-- Execute T001-T003 from `tasks.md` to initialize the repository structure.
