@@ -14,7 +14,7 @@ from auth.infrastructure.api.errors import UnauthorizedError, ForbiddenError
 # OAuth2PasswordBearer extracts token from Authorization: Bearer <token>
 # We register oauth2_scheme with scopes so Swagger UI knows about them
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="auth/token",
+    tokenUrl="api/v1/auth/login",
     scopes={
         "role:admin": "Administrator access",
         "role:analyst": "Analyst access",
