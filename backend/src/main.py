@@ -1,12 +1,26 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlmodel import Session
+
 from auth.infrastructure.api.routes import router as auth_router
 from auth.infrastructure.api.errors import register_auth_exception_handlers
+from auth.infrastructure.db.session import engine
+from auth.infrastructure.db.seeding import seed_initial_admin
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event to manage database seeding and other startup/shutdown behaviors."""
+    # Seed the initial admin account on startup
+    with Session(engine) as session:
+        seed_initial_admin(session)
+    yield
 
 app = FastAPI(
     title="Forecast RTA API",
     description="Automated Inventory Forecast and Management Monolith for RTA",
-    version="0.1.0"
+    version="0.1.0",
+    lifespan=lifespan
 )
 
 # Enable CORS for local development and integration

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LayoutDashboard, UserCheck, Key, ShieldAlert, LogOut } from 'lucide-react';
+import axios from 'axios';
 import { ToastProvider, useToast } from './application/context/ToastContext';
 import { UserRegistrationContainer } from './presentation/components/UserRegistrationContainer';
 
@@ -7,14 +8,51 @@ const AppContent: React.FC = () => {
   const { addToast } = useToast();
   const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
 
+  const autoDevLogin = async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append('username', 'admin@admin.com');
+      params.append('password', 'admin1234');
+      
+      const response = await axios.post(
+        import.meta.env.VITE_API_URL 
+          ? `${import.meta.env.VITE_API_URL}/auth/token` 
+          : 'http://localhost:8000/api/v1/auth/token', 
+        params,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+      );
+      
+      const { access_token } = response.data;
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('role', 'Admin');
+      setCurrentUserRole('Admin');
+      addToast('Development Bypass: Authenticated with root admin context.', 'success');
+    } catch (err) {
+      console.error('Failed to auto-login admin:', err);
+      // Fallback to mock behavior if backend is unreachable
+      localStorage.setItem('role', 'Admin');
+      setCurrentUserRole('Admin');
+    }
+  };
+
   // Load current token/role state on mount
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
-    setCurrentUserRole(role);
+    
+    if (!token || token.startsWith('mock_')) {
+      autoDevLogin();
+    } else {
+      setCurrentUserRole(role);
+    }
   }, []);
 
   // Simulation helpers for testing the registration UI under different user roles
-  const simulateLogin = (role: 'Admin' | 'Analyst' | 'Reviewer' | 'invalid') => {
+  const simulateLogin = async (role: 'Admin' | 'Analyst' | 'Reviewer' | 'invalid') => {
     if (role === 'invalid') {
       localStorage.setItem('token', 'invalid_expired_jwt_token');
       localStorage.setItem('role', 'Admin'); // Mimic admin UI but with invalid token
@@ -23,17 +61,12 @@ const AppContent: React.FC = () => {
       return;
     }
 
+    if (role === 'Admin') {
+      await autoDevLogin();
+      return;
+    }
+
     // Set mock token and role
-    // Under the hood, our JWT generation code on the backend parses the token.
-    // In order for the backend API to work, we actually need a valid JWT token signed by our SECRET_KEY!
-    // Since this is a local simulation, we can generate a real valid token using the backend test endpoints,
-    // or the administrator can log in.
-    // To make this super friendly, we check if we have a real signed token from the backend,
-    // otherwise we use a mock.
-    // Wait, let's generate a valid token using a client side utility or prompt the user.
-    // Actually, in TDD we can mock it. For testing, we can let the user paste their token, or we can pre-generate
-    // a valid signature since the key 'foundation_secret_key_2026' is static in .env!
-    // Let's explain this in the sidebar UI so the user knows exactly how to set their active session token.
     const mockToken = `mock_jwt_token_for_${role.toLowerCase()}`;
     localStorage.setItem('token', mockToken);
     localStorage.setItem('role', role);
