@@ -37,20 +37,20 @@ def test_rbac_admin_access(client: TestClient, db_session: Session):
     """Verify that an Administrator has access to all protected endpoints."""
     headers = generate_headers("admin_rbac@example.com", UserRole.ADMIN, db_session)
     
-    resp1 = client.get("/auth/test-analyst", headers=headers)
+    resp1 = client.get("/api/v1/auth/test-analyst", headers=headers)
     assert resp1.status_code == 200
     
-    resp2 = client.get("/auth/test-reviewer", headers=headers)
+    resp2 = client.get("/api/v1/auth/test-reviewer", headers=headers)
     assert resp2.status_code == 200
 
 def test_rbac_analyst_access(client: TestClient, db_session: Session):
     """Verify that an Analyst has access to Analyst and Reviewer endpoints, but not Admin endpoints if restricted."""
     headers = generate_headers("analyst_rbac@example.com", UserRole.ANALYST, db_session)
     
-    resp1 = client.get("/auth/test-analyst", headers=headers)
+    resp1 = client.get("/api/v1/auth/test-analyst", headers=headers)
     assert resp1.status_code == 200
     
-    resp2 = client.get("/auth/test-reviewer", headers=headers)
+    resp2 = client.get("/api/v1/auth/test-reviewer", headers=headers)
     assert resp2.status_code == 200
 
 def test_rbac_reviewer_access(client: TestClient, db_session: Session):
@@ -58,9 +58,9 @@ def test_rbac_reviewer_access(client: TestClient, db_session: Session):
     headers = generate_headers("reviewer_rbac@example.com", UserRole.REVIEWER, db_session)
     
     # Analyst endpoint must be Forbidden for Reviewer
-    resp1 = client.get("/auth/test-analyst", headers=headers)
+    resp1 = client.get("/api/v1/auth/test-analyst", headers=headers)
     assert resp1.status_code == 403
     
     # Reviewer endpoint must be allowed
-    resp2 = client.get("/auth/test-reviewer", headers=headers)
+    resp2 = client.get("/api/v1/auth/test-reviewer", headers=headers)
     assert resp2.status_code == 200

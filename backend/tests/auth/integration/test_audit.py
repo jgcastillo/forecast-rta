@@ -44,7 +44,7 @@ def test_audit_log_created_on_registration(client: TestClient, db_session: Sessi
         "role": "Analyst",
         "password": "password123"
     }
-    resp = client.post("/auth/register", json=payload, headers=headers)
+    resp = client.post("/api/v1/auth/register", json=payload, headers=headers)
     assert resp.status_code == 201
     new_user_id = resp.json()["id"]
     

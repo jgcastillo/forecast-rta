@@ -61,7 +61,7 @@ def test_register_user_success(client: TestClient, admin_headers: dict, db_sessi
         "password": "temporary_password123"
     }
     
-    response = client.post("/auth/register", json=payload, headers=admin_headers)
+    response = client.post("/api/v1/auth/register", json=payload, headers=admin_headers)
     assert response.status_code == 201
     
     data = response.json()
@@ -93,11 +93,11 @@ def test_register_user_email_conflict(client: TestClient, admin_headers: dict, d
         "password": "password123"
     }
     
-    response1 = client.post("/auth/register", json=payload, headers=admin_headers)
+    response1 = client.post("/api/v1/auth/register", json=payload, headers=admin_headers)
     assert response1.status_code == 201
     
     # Try registering again with the same email
-    response2 = client.post("/auth/register", json=payload, headers=admin_headers)
+    response2 = client.post("/api/v1/auth/register", json=payload, headers=admin_headers)
     assert response2.status_code == 409
     assert "already registered" in response2.json()["detail"].lower()
 
@@ -111,7 +111,7 @@ def test_register_user_unauthorized_non_admin(client: TestClient, analyst_header
         "password": "password123"
     }
     
-    response = client.post("/auth/register", json=payload, headers=analyst_headers)
+    response = client.post("/api/v1/auth/register", json=payload, headers=analyst_headers)
     assert response.status_code == 403
 
 def test_register_user_unauthorized_no_token(client: TestClient):
@@ -124,7 +124,7 @@ def test_register_user_unauthorized_no_token(client: TestClient):
         "password": "password123"
     }
     
-    response = client.post("/auth/register", json=payload)
+    response = client.post("/api/v1/auth/register", json=payload)
     assert response.status_code == 401
 
 def test_register_user_invalid_input(client: TestClient, admin_headers: dict):
@@ -137,7 +137,7 @@ def test_register_user_invalid_input(client: TestClient, admin_headers: dict):
         "role": "Analyst",
         "password": "password123"
     }
-    response = client.post("/auth/register", json=payload_bad_email, headers=admin_headers)
+    response = client.post("/api/v1/auth/register", json=payload_bad_email, headers=admin_headers)
     assert response.status_code == 422
     
     # Empty first name
@@ -148,5 +148,5 @@ def test_register_user_invalid_input(client: TestClient, admin_headers: dict):
         "role": "Analyst",
         "password": "password123"
     }
-    response = client.post("/auth/register", json=payload_bad_name, headers=admin_headers)
+    response = client.post("/api/v1/auth/register", json=payload_bad_name, headers=admin_headers)
     assert response.status_code == 422
