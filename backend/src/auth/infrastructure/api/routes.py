@@ -12,7 +12,7 @@ from auth.infrastructure.api.schemas import UserCreate, UserResponse
 from auth.infrastructure.api.dependencies import require_admin, get_user_repository, get_current_active_user
 from auth.infrastructure.security.hasher import verify_password
 from auth.infrastructure.security.jwt_handler import create_access_token
-from auth.infrastructure.api.errors import UnauthorizedError
+from auth.infrastructure.api.errors import UnauthorizedError, ForbiddenError
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -68,6 +68,27 @@ def login_for_access_token(
     
     if not user.is_active:
         raise UnauthorizedError("User account is inactive")
+        
+    access_token = create_access_token(
+        data={"sub": user.email, "role": user.role}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post(
+    "/login",
+    summary="User Login"
+)
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    repository: UserRepository = Depends(get_user_repository)
+):
+    """User login. Authenticates credentials and returns a JWT access token."""
+    user = repository.get_by_email(form_data.username)
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise UnauthorizedError("Incorrect email or password")
+    
+    if not user.is_active:
+        raise ForbiddenError("Inactive user account")
         
     access_token = create_access_token(
         data={"sub": user.email, "role": user.role}

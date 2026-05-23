@@ -1,86 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { LayoutDashboard, UserCheck, Key, ShieldAlert, LogOut } from 'lucide-react';
-import axios from 'axios';
-import { ToastProvider, useToast } from './application/context/ToastContext';
+import { ToastProvider } from './application/context/ToastContext';
+import { AuthProvider, useAuth } from './application/context/AuthContext';
 import { UserRegistrationContainer } from './presentation/components/UserRegistrationContainer';
+import { LoginForm } from './presentation/components/LoginForm';
 
 const AppContent: React.FC = () => {
-  const { addToast } = useToast();
-  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const { token, userRole, isAuthenticated, logout, simulateRole } = useAuth();
+  const [currentPath, setCurrentPath] = useState(window.location.hash || '#login');
 
-  const autoDevLogin = async () => {
-    try {
-      const params = new URLSearchParams();
-      params.append('username', 'admin@admin.com');
-      params.append('password', 'admin1234');
-      
-      const response = await axios.post(
-        import.meta.env.VITE_API_URL 
-          ? `${import.meta.env.VITE_API_URL}/auth/token` 
-          : 'http://localhost:8000/api/v1/auth/token', 
-        params,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }
-      );
-      
-      const { access_token } = response.data;
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('role', 'Admin');
-      setCurrentUserRole('Admin');
-      addToast('Development Bypass: Authenticated with root admin context.', 'success');
-    } catch (err) {
-      console.error('Failed to auto-login admin:', err);
-      // Fallback to mock behavior if backend is unreachable
-      localStorage.setItem('role', 'Admin');
-      setCurrentUserRole('Admin');
-    }
-  };
-
-  // Load current token/role state on mount
+  // Monitor URL hash changes for routing
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
-    
-    if (!token || token.startsWith('mock_')) {
-      autoDevLogin();
-    } else {
-      setCurrentUserRole(role);
-    }
+    const handleHashChange = () => {
+      setCurrentPath(window.location.hash || '#login');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Simulation helpers for testing the registration UI under different user roles
-  const simulateLogin = async (role: 'Admin' | 'Analyst' | 'Reviewer' | 'invalid') => {
-    if (role === 'invalid') {
-      localStorage.setItem('token', 'invalid_expired_jwt_token');
-      localStorage.setItem('role', 'Admin'); // Mimic admin UI but with invalid token
-      setCurrentUserRole('Admin');
-      addToast('Simulating: Logged in as Admin but with expired/invalid JWT token.', 'error');
-      return;
+  // Route guard: Redirect unauthenticated users to #login, and logged-in users to #register
+  useEffect(() => {
+    if (!isAuthenticated) {
+      if (currentPath !== '#login') {
+        window.location.hash = '#login';
+      }
+    } else {
+      if (currentPath === '#login') {
+        window.location.hash = '#register';
+      }
     }
+  }, [isAuthenticated, currentPath]);
 
-    if (role === 'Admin') {
-      await autoDevLogin();
-      return;
-    }
+  // Public login page layout
+  if (!isAuthenticated || currentPath === '#login') {
+    return (
+      <div 
+        style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100vh',
+          padding: '2rem',
+          backgroundColor: 'var(--bg-primary)'
+        }}
+      >
+        <LoginForm />
+      </div>
+    );
+  }
 
-    // Set mock token and role
-    const mockToken = `mock_jwt_token_for_${role.toLowerCase()}`;
-    localStorage.setItem('token', mockToken);
-    localStorage.setItem('role', role);
-    setCurrentUserRole(role);
-    addToast(`Simulated Session: Logged in as ${role}`, 'success');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    setCurrentUserRole(null);
-    addToast('Logged out of simulation session.', 'success');
-  };
-
+  // Private application layout with sidebar
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
@@ -95,7 +64,7 @@ const AppContent: React.FC = () => {
         <nav style={{ marginTop: '1.5rem', flexGrow: 1 }}>
           <ul className="nav-list">
             <li>
-              <a href="#register" className="nav-item active">
+              <a href="#register" className={`nav-item ${currentPath === '#register' ? 'active' : ''}`}>
                 <UserCheck size={18} />
                 <span>Onboarding Form</span>
               </a>
@@ -128,58 +97,56 @@ const AppContent: React.FC = () => {
             <button 
               className="btn-primary" 
               style={{ padding: '0.5rem', fontSize: '0.8rem', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid var(--accent-primary)', color: 'var(--text-primary)', boxShadow: 'none' }}
-              onClick={() => simulateLogin('Admin')}
+              onClick={() => simulateRole('Admin')}
             >
               Simulate: Admin (Local)
             </button>
             <button 
               className="btn-primary" 
               style={{ padding: '0.5rem', fontSize: '0.8rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-glass)', color: 'var(--text-primary)', boxShadow: 'none' }}
-              onClick={() => simulateLogin('Analyst')}
+              onClick={() => simulateRole('Analyst')}
             >
               Simulate: Analyst
             </button>
             <button 
               className="btn-primary" 
               style={{ padding: '0.5rem', fontSize: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: 'var(--text-primary)', boxShadow: 'none' }}
-              onClick={() => simulateLogin('invalid')}
+              onClick={() => simulateRole('invalid')}
             >
               Simulate: Expired Token
             </button>
           </div>
 
-          {currentUserRole && (
-            <div style={{ marginTop: '0.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Active Context:</span>
-                <strong style={{ color: 'var(--accent-secondary)' }}>{currentUserRole}</strong>
-              </div>
-              <button 
-                onClick={handleLogout}
-                style={{ 
-                  background: 'none', 
-                  border: 'none', 
-                  color: 'var(--error)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '0.25rem', 
-                  fontSize: '0.75rem', 
-                  marginTop: '0.5rem', 
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              >
-                <LogOut size={12} />
-                <span>Clear Session</span>
-              </button>
+          <div style={{ marginTop: '0.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
+              <span style={{ color: 'var(--text-secondary)' }}>Active Context:</span>
+              <strong style={{ color: 'var(--accent-secondary)' }}>{userRole}</strong>
             </div>
-          )}
+            <button 
+              onClick={logout}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: 'var(--error)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.25rem', 
+                fontSize: '0.75rem', 
+                marginTop: '0.5rem', 
+                cursor: 'pointer',
+                padding: 0
+              }}
+            >
+              <LogOut size={12} />
+              <span>Clear Session</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <main className="main-content">
-        {currentUserRole === 'Admin' ? (
+        {userRole === 'Admin' ? (
           <UserRegistrationContainer />
         ) : (
           <div style={{ maxWidth: '600px', margin: '6rem auto', textAlign: 'center' }}>
@@ -205,7 +172,7 @@ const AppContent: React.FC = () => {
             <button 
               className="btn-primary" 
               style={{ maxWidth: '240px', margin: '0 auto' }}
-              onClick={() => simulateLogin('Admin')}
+              onClick={() => simulateRole('Admin')}
             >
               Unlock Admin Portal
             </button>
@@ -219,8 +186,11 @@ const AppContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <ToastProvider>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ToastProvider>
   );
 };
+
 export default App;

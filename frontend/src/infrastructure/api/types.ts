@@ -21,3 +21,13 @@ export interface UserResponse {
 export interface ApiError {
   detail: string | { loc: (string | number)[]; msg: string; type: string }[];
 }
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+}

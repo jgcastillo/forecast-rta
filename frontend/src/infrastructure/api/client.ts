@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserCreate, UserResponse } from './types';
+import { UserCreate, UserResponse, LoginCredentials, TokenResponse } from './types';
 
 // Create an Axios instance with base url pointing to proxied backend endpoint
 const apiClient = axios.create({
@@ -27,6 +27,18 @@ apiClient.interceptors.request.use(
 export const authApi = {
   register: async (payload: UserCreate): Promise<UserResponse> => {
     const response = await apiClient.post<UserResponse>('/auth/register', payload);
+    return response.data;
+  },
+  login: async (credentials: LoginCredentials): Promise<TokenResponse> => {
+    const params = new URLSearchParams();
+    params.append('username', credentials.username);
+    params.append('password', credentials.password);
+    
+    const response = await apiClient.post<TokenResponse>('/auth/login', params, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
     return response.data;
   },
 };
