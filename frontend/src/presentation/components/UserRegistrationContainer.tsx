@@ -17,7 +17,7 @@ export const UserRegistrationContainer: React.FC = () => {
           background: 'rgba(99, 102, 241, 0.1)',
           display: 'flex',
           alignItems: 'center',
-          justify-content: center,
+          justifyContent: 'center',
           color: 'var(--accent-primary)',
           border: '1px solid rgba(99, 102, 241, 0.2)'
         }}
