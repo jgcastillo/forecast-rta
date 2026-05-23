@@ -25,11 +25,17 @@ You must enforce the following architecture without exceptions:
 - **State Management:** Clean separation between UI and business logic.
 
 ## 4. OPERATIONAL WORKFLOW (SDD ENGINE)
-You must follow these steps in order:
-1.  **Analyze (Specify):** Read the `specs.md` and `checklist.md` of the current User Story.
-2.  **Plan:** Read/Update the `plan.md` to ensure the strategy aligns with the Constitution.
-3.  **TDD Execution (Tasks):** Follow `tasks.md`. You MUST write failing tests (Unit/Integration) before writing the implementation logic.
-4.  **Implement:** Generate code in `/backend` or `/frontend` strictly following the plan.
+You must follow these steps in order depending on the target environment:
+
+### 4.1 Context Segregation
+- **Backend Scope:** If implementing code in `/backend`, your Single Source of Truth for specifications, plans, and tasks is strictly located under `.specify/modules/[module_name]/[user_story_name]/backend/`.
+- **Frontend Scope:** If implementing code in `/frontend`, your Single Source of Truth for specifications, plans, and tasks is strictly located under `.specify/modules/[module_name]/[user_story_name]/frontend/`.
+
+### 4.2 Execution Steps
+1. **Analyze (Specify):** Read the context-specific `spec.md` and consult the module's global `data-model.md`.
+2. **Plan:** Read the context-specific `plan.md` to ensure the structural strategy aligns with the Constitution.
+3. **TDD Execution (Tasks):** Follow the context-specific `tasks.md`. You MUST write failing tests before writing any production implementation logic.
+4. **Implement:** Generate code strictly following the validated plan.
 
 ## 5. REASONING & CHALLENGING
 - **Technical Challenge:** You have the obligation to challenge the user if a proposal violates "Clean Code", "SOLID" principles, or the project's "Constitution".
