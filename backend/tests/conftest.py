@@ -3,6 +3,10 @@ from loguru import logger
 from sqlmodel import SQLModel, create_engine, Session
 from sqlalchemy.pool import StaticPool
 
+# Import all database models here to register them with SQLModel.metadata
+from auth.infrastructure.db.models import User
+from auth.infrastructure.db.models_audit import AuditLog
+
 # Configure Loguru for testing to avoid cluttering test output while retaining warning/error logs
 @pytest.fixture(autouse=True)
 def configure_logging():

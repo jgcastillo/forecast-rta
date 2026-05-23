@@ -56,13 +56,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T016 [P] [US2] Create test for Role-to-Scope mapping logic in `backend/tests/auth/unit/test_roles.py`
-- [ ] T017 [US2] Create integration test for Protected Routes using JWT Scopes in `backend/tests/auth/integration/test_rbac.py`
+- [x] T016 [P] [US2] Create test for Role-to-Scope mapping logic in `backend/tests/auth/unit/test_roles.py`
+- [x] T017 [US2] Create integration test for Protected Routes using JWT Scopes in `backend/tests/auth/integration/test_rbac.py`
 
 ### Implementation for User Story 2
 
-- [ ] T018 [P] [US2] Implement Role validation logic in `backend/src/auth/domain/roles.py`
-- [ ] T019 [US2] Implement `get_current_active_user` dependency with scope validation in `backend/src/auth/infrastructure/api/dependencies.py`
+- [x] T018 [P] [US2] Implement Role validation logic in `backend/src/auth/domain/roles.py`
+- [x] T019 [US2] Implement `get_current_active_user` dependency with scope validation in `backend/src/auth/infrastructure/api/dependencies.py`
 
 ---
 
@@ -74,22 +74,22 @@
 
 ### Tests for User Story 3
 
-- [ ] T020 [P] [US3] Create test for `AuditLog` creation after successful registration in `backend/tests/auth/integration/test_audit.py`
+- [x] T020 [P] [US3] Create test for `AuditLog` creation after successful registration in `backend/tests/auth/integration/test_audit.py`
 
 ### Implementation for User Story 3
 
-- [ ] T021 [P] [US3] Create `AuditLog` SQLModel entity in `backend/src/auth/infrastructure/db/models_audit.py`
-- [ ] T022 [US3] Implement Audit Service and link it to the `RegisterUser` use case.
-- [ ] T023 [US3] Setup basic SMTP/Email dispatcher hook for temporary password notification.[cite: 1]
+- [x] T021 [P] [US3] Create `AuditLog` SQLModel entity in `backend/src/auth/infrastructure/db/models_audit.py`
+- [x] T022 [US3] Implement Audit Service and link it to the `RegisterUser` use case.
+- [x] T023 [US3] Setup basic SMTP/Email dispatcher hook for temporary password notification.
 
 ---
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T024 [P] Update `README.md` with Auth Module API documentation.
-- [ ] T025 Run `alembic revision --autogenerate` to finalize database migration for US-01.
-- [ ] T026 [P] Security audit: Ensure no plain-text passwords are logged in `loguru` outputs.
-- [ ] T027 Final validation of `quickstart.md` steps.
+- [x] T024 [P] Update `README.md` with Auth Module API documentation.
+- [x] T025 Run `alembic revision --autogenerate` to finalize database migration for US-01.
+- [x] T026 [P] Security audit: Ensure no plain-text passwords are logged in `loguru` outputs.
+- [x] T027 Final validation of `quickstart.md` steps.
 
 ---
 
