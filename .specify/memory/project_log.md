@@ -36,6 +36,34 @@
 - [x] **IDE Config:** `ANTIGRAVITY.md` created for context persistence.
 - [x] **Infrastructure:** Docker Compose launched successfully (db, api, web).
 
+## [2026-05-23] - User Registration MVP (US-01) Implementation
+
+**Status**: Phase 1, Phase 2, and Phase 3 (US-01 MVP) COMPLETE.
+
+### Accomplishments:
+- **Testing Foundation (T003)**: Configured pytest and loguru in `backend/tests/conftest.py` with in-memory SQLite engine and session fixtures.
+- **Database Connection (T004)**: Set up SQLModel database engine and session utilities in `backend/src/auth/infrastructure/db/session.py`.
+- **JWT & Token Utilities (T005)**: Implemented token generation and decoding in `backend/src/auth/infrastructure/security/jwt_handler.py`.
+- **Bcrypt Hashing (T006)**: Implemented password hashing and verification.
+- **Domain Modeling (T007, T009)**: Created the pure domain `User` entity and `UserRole` enum in `backend/src/auth/domain/models.py`, with unit test suite covering validation rules.
+- **API Errors (T008)**: Established custom HTTP exception classes and mapped them to FastAPI handlers in `backend/src/auth/infrastructure/api/errors.py`.
+- **Integration Testing (T010)**: Created API integration tests for `/auth/register` happy path, conflicts, and unauthorized access in `backend/tests/auth/integration/test_registration.py`.
+- **Schema & Persistence (T011, T012, T013)**: Implemented Pydantic models for user creation/response, the `UserRepository` database adapter, and the `RegisterUser` application use case.
+- **Routers & Main Application (T014, T015)**: Created the FastAPI router for user registration and JWT token endpoints in `backend/src/auth/infrastructure/api/routes.py`, integrated OAuth2Bearer dependencies, and wired up `backend/src/main.py`.
+
+### Decisions & Observations:
+- **Bypassed Passlib**: Replaced `passlib[bcrypt]` with native `bcrypt` in `hasher.py` to fix a known Python 3.13 compatibility issue with `passlib` where bcrypt raises a `ValueError` for passwords longer than 72 bytes.
+- **Port Conflict Resolved**: Configured host port binding for Vite web service to `5174:5173` to prevent conflicts with other development servers running locally.
+
+### Next Steps:
+- Execute Phase 4 (P2) of `tasks.md`:
+    - T016: Create test for Role-to-Scope mapping logic.
+    - T017: Create integration test for Protected Routes using JWT Scopes.
+    - T018: Implement Role validation logic in domain.
+    - T019: Implement active user scope validation dependency.
+
+---
+
 ## [2026-05-14] - Docker Infrastructure & Environment Setup
 
 **Status**: Infrastructure Verified.

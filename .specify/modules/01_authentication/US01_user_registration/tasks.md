@@ -7,19 +7,19 @@
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Create backend directory structure: `auth/domain`, `auth/application`, `auth/infrastructure`
-- [ ] T002 [P] Configure `pyproject.toml` with dependencies: `fastapi`, `sqlmodel`, `python-jose`, `passlib[bcrypt]`
-- [ ] T003 [P] Setup `pytest` and `loguru` configuration in `backend/tests/conftest.py`
+- [x] T001 Create backend directory structure: `auth/domain`, `auth/application`, `auth/infrastructure`
+- [x] T002 [P] Configure `pyproject.toml` with dependencies: `fastapi`, `sqlmodel`, `python-jose`, `passlib[bcrypt]`
+- [x] T003 [P] Setup `pytest` and `loguru` configuration in `backend/tests/conftest.py`
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-- [ ] T004 Setup Database engine and Session utilities in `backend/src/auth/infrastructure/db/session.py`
-- [ ] T005 [P] Implement JWT Utility service (token creation/decoding) in `backend/src/auth/infrastructure/security/jwt_handler.py`
-- [ ] T006 [P] Implement Password Hashing utility in `backend/src/auth/infrastructure/security/hasher.py`
-- [ ] T007 Create Base `User` and `Role` Enums in `backend/src/auth/domain/models.py`
-- [ ] T008 Setup Global Exception Handler for Auth Module in `backend/src/auth/infrastructure/api/errors.py`
+- [x] T004 Setup Database engine and Session utilities in `backend/src/auth/infrastructure/db/session.py`
+- [x] T005 [P] Implement JWT Utility service (token creation/decoding) in `backend/src/auth/infrastructure/security/jwt_handler.py`
+- [x] T006 [P] Implement Password Hashing utility in `backend/src/auth/infrastructure/security/hasher.py`
+- [x] T007 Create Base `User` and `Role` Enums in `backend/src/auth/domain/models.py`
+- [x] T008 Setup Global Exception Handler for Auth Module in `backend/src/auth/infrastructure/api/errors.py`
 
 **Checkpoint**: Foundation ready - Authentication infrastructure and security utilities are in place.
 
@@ -33,16 +33,16 @@
 
 ### Tests for User Story 1 (TDD - Write FIRST)
 
-- [ ] T009 [P] [US1] Create unit test for `User` domain entity validation in `backend/tests/auth/unit/test_user_domain.py`
-- [ ] T010 [P] [US1] Create integration test for `/auth/register` endpoint (Happy Path & Email Conflict) in `backend/tests/auth/integration/test_registration.py`
+- [x] T009 [P] [US1] Create unit test for `User` domain entity validation in `backend/tests/auth/unit/test_user_domain.py`
+- [x] T010 [P] [US1] Create integration test for `/auth/register` endpoint (Happy Path & Email Conflict) in `backend/tests/auth/integration/test_registration.py`
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Define `UserCreate` and `UserResponse` Pydantic schemas in `backend/src/auth/infrastructure/api/schemas.py`
-- [ ] T012 [P] [US1] Implement `UserRepository` (SQLModel) in `backend/src/auth/infrastructure/db/repository.py`
-- [ ] T013 [US1] Implement `RegisterUser` Use Case in `backend/src/auth/application/register_user.py` (Depends on T012)
-- [ ] T014 [US1] Create FastAPI Router for Registration in `backend/src/auth/infrastructure/api/routes.py`
-- [ ] T015 [US1] Integrate `OAuth2PasswordBearer` in `backend/src/auth/infrastructure/api/dependencies.py`
+- [x] T011 [P] [US1] Define `UserCreate` and `UserResponse` Pydantic schemas in `backend/src/auth/infrastructure/api/schemas.py`
+- [x] T012 [P] [US1] Implement `UserRepository` (SQLModel) in `backend/src/auth/infrastructure/db/repository.py`
+- [x] T013 [US1] Implement `RegisterUser` Use Case in `backend/src/auth/application/register_user.py` (Depends on T012)
+- [x] T014 [US1] Create FastAPI Router for Registration in `backend/src/auth/infrastructure/api/routes.py`
+- [x] T015 [US1] Integrate `OAuth2PasswordBearer` in `backend/src/auth/infrastructure/api/dependencies.py`
 
 **Checkpoint**: User Story 1 is functional. Users can be registered and persisted in PostgreSQL.
 
