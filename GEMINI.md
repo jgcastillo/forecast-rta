@@ -24,6 +24,15 @@ You must enforce the following architecture without exceptions:
 - **Component-Based:** Modular, reusable, and strictly typed.
 - **State Management:** Clean separation between UI and business logic.
 
+### 3.3 FRONTEND DESIGN PRINCIPLES (Anti-Generic AI Aesthetics)
+When generating UI components, you MUST adhere to the following design standards to ensure a production-grade, visually striking interface:
+1. **Typography as Identity:** DO NOT use generic fonts (Arial, Inter, Roboto, Space Grotesk). Choose unexpected, distinctive, characterful font choices. Pair a distinctive display font with a refined body font.
+2. **Color & Theme:** Commit to a cohesive aesthetic using CSS variables. Use dominant colors with sharp accents rather than timid, evenly-distributed palettes. Avoid the cliché "purple gradient on white".
+3. **Spatial Composition:** Favor generous negative space, asymmetry, overlap, or diagonal flow over predictable grid cards. 
+4. **Motion (Justified):** Prioritize high-impact moments. A well-orchestrated page load with staggered reveals is better than scattered, chaotic micro-interactions. If you can't articulate WHY something moves, it shouldn't.
+5. **Backgrounds & Details:** Use depth, subtle layered transparencies, dramatic shadows, or noise textures to create atmosphere rather than defaulting to solid flat colors.
+6. **Code Structure:** State and business logic MUST be separated from the presentation layer (Custom Hooks). Inline CSS is forbidden; use Tailwind or your active utility-first CSS framework.
+
 ## 4. OPERATIONAL WORKFLOW (SDD ENGINE)
 You must follow these steps in order depending on the target environment:
 
