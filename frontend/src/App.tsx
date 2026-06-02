@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { LayoutDashboard, UserCheck, Key, ShieldAlert, LogOut } from 'lucide-react';
 import { ToastProvider } from './application/context/ToastContext';
 import { AuthProvider, useAuth } from './application/context/AuthContext';
+import { ThemeProvider } from './application/context/ThemeContext';
+import { ThemeToggle } from './presentation/components/ThemeToggle';
 import { UserRegistrationContainer } from './presentation/components/UserRegistrationContainer';
 import { LoginForm } from './presentation/components/LoginForm';
 
 const AppContent: React.FC = () => {
-  const { token, userRole, isAuthenticated, logout, simulateRole } = useAuth();
+  const { userRole, isAuthenticated, logout, simulateRole } = useAuth();
   const [currentPath, setCurrentPath] = useState(window.location.hash || '#login');
 
   // Monitor URL hash changes for routing
@@ -71,6 +73,11 @@ const AppContent: React.FC = () => {
             </li>
           </ul>
         </nav>
+
+        {/* Theme Toggle Switch */}
+        <div style={{ marginTop: 'auto', marginBottom: '0.25rem' }}>
+          <ThemeToggle />
+        </div>
 
         {/* Developer Sandbox Panel */}
         <div 
@@ -185,11 +192,13 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 };
 

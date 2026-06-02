@@ -40,7 +40,9 @@ app.add_middleware(
 register_auth_exception_handlers(app)
 
 # Include routes with the correct api/v1 prefix
+from auth.infrastructure.api.routes import router as auth_router, users_router
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
 
 @app.get("/health", tags=["Health"])
 def health_check():

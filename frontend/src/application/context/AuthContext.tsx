@@ -147,7 +147,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Handle initial auto-login in dev mode if session is empty or mock-admin
   useEffect(() => {
-    const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
+    const isTest = typeof window !== 'undefined' && (window as any).process?.env?.NODE_ENV === 'test';
     if (!isTest && (!token || token.startsWith('mock_'))) {
       // Auto login as admin for smooth developer workflow
       simulateRole('Admin');

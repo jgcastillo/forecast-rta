@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserCreate, UserResponse, LoginCredentials, TokenResponse } from './types';
+import { UserCreate, UserResponse, LoginCredentials, TokenResponse, UserUpdate } from './types';
 
 // Create an Axios instance with base url pointing to proxied backend endpoint
 const apiClient = axios.create({
@@ -39,6 +39,14 @@ export const authApi = {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
+    return response.data;
+  },
+  getUsers: async (): Promise<UserResponse[]> => {
+    const response = await apiClient.get<UserResponse[]>('/users');
+    return response.data;
+  },
+  updateUser: async (id: string, payload: UserUpdate): Promise<UserResponse> => {
+    const response = await apiClient.patch<UserResponse>(`/users/${id}`, payload);
     return response.data;
   },
 };

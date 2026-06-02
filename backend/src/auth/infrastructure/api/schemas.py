@@ -26,6 +26,26 @@ class UserCreate(UserBase):
             raise ValueError("First name and last name cannot be empty")
         return trimmed
 
+from typing import Optional
+from sqlmodel import SQLModel
+
 class UserResponse(UserBase):
     id: UUID
     created_at: datetime
+
+class UserUpdate(SQLModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    role: Optional[UserRole] = None
+    is_active: Optional[bool] = None
+
+    @field_validator("first_name", "last_name")
+    @classmethod
+    def validate_names_not_empty(cls, v: Optional[str]) -> Optional[str]:
+        """Validate names are not blank if provided."""
+        if v is not None:
+            trimmed = v.strip()
+            if not trimmed:
+                raise ValueError("Name cannot be empty or only spaces")
+            return trimmed
+        return v

@@ -31,3 +31,10 @@ export interface TokenResponse {
   access_token: string;
   token_type: string;
 }
+
+export interface UserUpdate {
+  first_name?: string;
+  last_name?: string;
+  role?: UserRole;
+  is_active?: boolean;
+}

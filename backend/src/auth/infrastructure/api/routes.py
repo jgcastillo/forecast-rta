@@ -116,3 +116,47 @@ def test_reviewer_endpoint(
 ):
     """A dummy endpoint to verify Role-Based Access Control for Reviewers, Analysts, and Admins."""
     return {"message": f"Hello Reviewer {current_user.email}! Access granted."}
+
+
+# --- Users Management Endpoints (US-03) ---
+
+from uuid import UUID
+from fastapi import HTTPException
+from auth.infrastructure.api.schemas import UserUpdate
+
+users_router = APIRouter(prefix="/users", tags=["Users"])
+
+@users_router.get(
+    "",
+    response_model=list[UserResponse],
+    summary="List all users (Admin only)"
+)
+def list_users(
+    repository: UserRepository = Depends(get_user_repository),
+    current_admin = Depends(require_admin)
+):
+    """Retrieve all registered users. Only accessible by Administrators."""
+    return repository.get_all()
+
+@users_router.patch(
+    "/{user_id}",
+    response_model=UserResponse,
+    summary="Modify a user's details (Admin only)"
+)
+def modify_user(
+    user_id: UUID,
+    user_update: UserUpdate,
+    repository: UserRepository = Depends(get_user_repository),
+    current_admin = Depends(require_admin)
+):
+    """Modify details of a user account. Only accessible by Administrators."""
+    user = repository.get_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Perform partial update by excluding unset payload values
+    update_data = user_update.model_dump(exclude_unset=True)
+    
+    # Save target user and write event log atomically
+    updated_user = repository.update_user(user, update_data, current_admin.id)
+    return updated_user
