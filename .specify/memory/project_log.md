@@ -36,6 +36,21 @@
 - [x] **IDE Config:** `ANTIGRAVITY.md` created for context persistence.
 - [x] **Infrastructure:** Docker Compose launched successfully (db, api, web).
 
+## [2026-06-02] - Password Reset (US-04) API & UI Implementation
+
+**Status**: 100% COMPLETE (All Backend, Frontend, and Test phases verified).
+
+### Accomplishments:
+- **Security & Tokens**: Implemented `create_password_reset_token` and `verify_password_reset_token` using PyJWT with a 15-minute expiration time and `password_reset` scope.
+- **Backend Endpoints**: Created `POST /api/v1/auth/password-recovery/{email}` (logging the link in development console and preventing email enumeration) and `POST /api/v1/auth/reset-password` (updating passwords atomically and recording the `PASSWORD_RESET` audit log).
+- **Network Layer**: Added payload schemas and methods in `client.ts` to coordinate recovery requests and reset submissions.
+- **Routing & Guards**: Upgraded route guards in `App.tsx` to permit unauthenticated access to the recovery hash paths `#forgot-password` and `#reset-password`, and added router views for `#forgot-password` and `#reset-password`. Fixed routing hierarchy by normalizing pathnames to hash routes and ensuring public recovery views are bypassable by the development auto-login simulation. Implemented a global response interceptor in `AuthContext.tsx` to catch 401 unauthorized responses on private APIs, clearing expired sessions and redirecting to login. Ensured successful password resets in `ResetPasswordView` trigger a clean logout to prevent incorrect route guard redirects to the dashboard.
+- **Presentation Views**: Designed custom `ForgotPasswordView` and `ResetPasswordView` utilizing glassmorphism, Outfit display font headers, confirm-password comparisons, strength indicators, and success transition states.
+- **Light/Dark Toggle**: Fully hooked the new recovery views to the dynamic theme CSS variables.
+- **TDD Quality**: Implemented 5 integration tests in `test_password_reset.py` verifying success and error paths (expired tokens, weak passwords, nonexistent users), with all 34 backend and 12 frontend tests passing successfully.
+
+---
+
 ## [2026-06-02] - User Modification & Theme Toggle (US-03) Implementation
 
 **Status**: 100% COMPLETE (All Backend, Frontend, and Styling Phases implemented and verified).

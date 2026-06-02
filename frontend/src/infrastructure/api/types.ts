@@ -38,3 +38,8 @@ export interface UserUpdate {
   role?: UserRole;
   is_active?: boolean;
 }
+
+export interface ResetPasswordPayload {
+  token: string;
+  new_password: string;
+}

@@ -33,3 +33,21 @@ def decode_access_token(token: str) -> dict:
         JWTError: If the token is invalid, expired, or signature verification fails.
     """
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+def create_password_reset_token(email: str) -> str:
+    """Create a short-lived password reset token (15 mins duration)."""
+    to_encode = {
+        "sub": email,
+        "scope": "password_reset",
+    }
+    return create_access_token(data=to_encode, expires_delta=timedelta(minutes=15))
+
+def verify_password_reset_token(token: str) -> str | None:
+    """Decode and verify the password reset token, returning email if valid."""
+    try:
+        payload = decode_access_token(token)
+        if payload.get("scope") != "password_reset":
+            return None
+        return payload.get("sub")
+    except JWTError:
+        return None

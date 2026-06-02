@@ -125,7 +125,21 @@ export const LoginForm: React.FC = () => {
 
           {/* Password input field */}
           <div className="form-group" style={{ marginBottom: '2rem' }}>
-            <label className="form-label" htmlFor="password-input">Password</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className="form-label" htmlFor="password-input">Password</label>
+              <a 
+                href="#forgot-password" 
+                style={{ 
+                  fontSize: '0.8rem', 
+                  color: 'var(--accent-primary)', 
+                  textDecoration: 'none', 
+                  fontWeight: 600,
+                  transition: 'color var(--transition-fast)'
+                }}
+              >
+                Forgot Password?
+              </a>
+            </div>
             <div className="input-container">
               <input
                 id="password-input"

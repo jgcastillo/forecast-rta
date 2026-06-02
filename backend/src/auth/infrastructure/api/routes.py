@@ -1,3 +1,4 @@
+from loguru import logger
 from fastapi import APIRouter, Depends, Security, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
@@ -8,10 +9,10 @@ from auth.infrastructure.db.repository_audit import AuditRepository
 from auth.infrastructure.services.email_dispatcher import EmailDispatcher
 from auth.application.register_user import RegisterUser
 from auth.application.audit_service import AuditService
-from auth.infrastructure.api.schemas import UserCreate, UserResponse
+from auth.infrastructure.api.schemas import UserCreate, UserResponse, ResetPasswordInput
 from auth.infrastructure.api.dependencies import require_admin, get_user_repository, get_current_active_user
 from auth.infrastructure.security.hasher import verify_password
-from auth.infrastructure.security.jwt_handler import create_access_token
+from auth.infrastructure.security.jwt_handler import create_access_token, create_password_reset_token, verify_password_reset_token
 from auth.infrastructure.api.errors import UnauthorizedError, ForbiddenError
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -94,6 +95,66 @@ def login(
         data={"sub": user.email, "role": user.role}
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post(
+    "/password-recovery/{email}",
+    summary="Request a password recovery link"
+)
+def request_password_recovery(
+    email: str,
+    repository: UserRepository = Depends(get_user_repository)
+):
+    """Generate a password recovery link and log it to the terminal console (Dev Mode)."""
+    user = repository.get_by_email(email)
+    if user:
+        token = create_password_reset_token(email)
+        reset_link = f"http://localhost:5174/#reset-password?token={token}"
+        logger.info(f"Dev Mode - Password recovery link generated for {email}: {reset_link}")
+    else:
+        logger.warning(f"Password recovery requested for unregistered email: {email}")
+        
+    return {"detail": "If the email is registered, a password reset link has been generated."}
+
+
+@router.post(
+    "/reset-password",
+    summary="Reset user password"
+)
+def reset_password(
+    input_data: ResetPasswordInput,
+    repository: UserRepository = Depends(get_user_repository),
+    session: Session = Depends(get_session)
+):
+    """Validate token and update password atomically in database."""
+    email = verify_password_reset_token(input_data.token)
+    if not email:
+        raise UnauthorizedError("Invalid or expired reset token")
+        
+    user = repository.get_by_email(email)
+    if not user:
+        raise UnauthorizedError("Invalid or expired reset token")
+        
+    from auth.infrastructure.security.hasher import hash_password
+    hashed = hash_password(input_data.new_password)
+    
+    # Perform atomic update inside session transaction
+    user.hashed_password = hashed
+    session.add(user)
+    
+    # Create audit log
+    from auth.infrastructure.db.models_audit import AuditLog
+    audit_log = AuditLog(
+        actor_id=user.id,
+        target_id=user.id,
+        action="PASSWORD_RESET",
+        details={"email": email}
+    )
+    session.add(audit_log)
+    session.commit()
+    
+    return {"detail": "Password has been reset successfully."}
+
 
 # --- RBAC Test Endpoints ---
 

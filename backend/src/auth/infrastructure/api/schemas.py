@@ -49,3 +49,15 @@ class UserUpdate(SQLModel):
                 raise ValueError("Name cannot be empty or only spaces")
             return trimmed
         return v
+
+class ResetPasswordInput(SQLModel):
+    token: str
+    new_password: str = Field(min_length=8)
+
+    @field_validator("new_password")
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        """Validate password strength (at least 1 letter and 1 number)."""
+        if not re.search(r"[A-Za-z]", v) or not re.search(r"[0-9]", v):
+            raise ValueError("Password too weak: must contain at least one letter and one number")
+        return v

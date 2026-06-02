@@ -6,35 +6,78 @@ import { ThemeProvider } from './application/context/ThemeContext';
 import { ThemeToggle } from './presentation/components/ThemeToggle';
 import { UserRegistrationContainer } from './presentation/components/UserRegistrationContainer';
 import { LoginForm } from './presentation/components/LoginForm';
+import { ForgotPasswordView } from './presentation/components/ForgotPasswordView';
+import { ResetPasswordView } from './presentation/components/ResetPasswordView';
 
 const AppContent: React.FC = () => {
   const { userRole, isAuthenticated, logout, simulateRole } = useAuth();
-  const [currentPath, setCurrentPath] = useState(window.location.hash || '#login');
+  
+  // Extract correct route from hash or fallback to pathname
+  const getInitialPath = () => {
+    const hash = window.location.hash;
+    const path = window.location.pathname;
+    if (hash) return hash;
+    if (path === '/forgot-password') return '#forgot-password';
+    if (path.startsWith('/reset-password')) {
+      const search = window.location.search;
+      return `#reset-password${search}`;
+    }
+    if (path === '/login') return '#login';
+    return '#login';
+  };
 
-  // Monitor URL hash changes for routing
+  const [currentPath, setCurrentPath] = useState(getInitialPath());
+
+  // Monitor URL changes for routing and sync pathname to hash
   useEffect(() => {
     const handleHashChange = () => {
       setCurrentPath(window.location.hash || '#login');
     };
+
+    // Sync initial pathname routes to hash-based routes immediately
+    const path = window.location.pathname;
+    if (path === '/forgot-password') {
+      window.location.replace('/#forgot-password');
+    } else if (path.startsWith('/reset-password')) {
+      const search = window.location.search;
+      window.location.replace(`/#reset-password${search}`);
+    } else if (path === '/login') {
+      window.location.replace('/#login');
+    }
+
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Route guard: Redirect unauthenticated users to #login, and logged-in users to #register
+  // Route guard: Redirect unauthenticated users to #login (or allowed public routes), and logged-in users to #register
   useEffect(() => {
+    const isPublicRoute = 
+      currentPath === '#login' || 
+      currentPath === '#forgot-password' || 
+      currentPath.startsWith('#reset-password');
+
     if (!isAuthenticated) {
-      if (currentPath !== '#login') {
+      if (!isPublicRoute) {
         window.location.hash = '#login';
       }
     } else {
+      // Authenticated users on the login gate are redirected to onboarding.
+      // Public recovery screens should remain fully accessible without forcing layout wrappers.
       if (currentPath === '#login') {
         window.location.hash = '#register';
       }
     }
   }, [isAuthenticated, currentPath]);
 
-  // Public login page layout
-  if (!isAuthenticated || currentPath === '#login') {
+  // Public login, forgot-password, and reset-password page layout
+  if (!isAuthenticated || currentPath === '#login' || currentPath === '#forgot-password' || currentPath.startsWith('#reset-password')) {
+    let formComponent = <LoginForm />;
+    if (currentPath === '#forgot-password') {
+      formComponent = <ForgotPasswordView />;
+    } else if (currentPath.startsWith('#reset-password')) {
+      formComponent = <ResetPasswordView />;
+    }
+
     return (
       <div 
         style={{ 
@@ -43,10 +86,11 @@ const AppContent: React.FC = () => {
           justifyContent: 'center', 
           minHeight: '100vh',
           padding: '2rem',
-          backgroundColor: 'var(--bg-primary)'
+          backgroundColor: 'var(--bg-primary)',
+          transition: 'background-color var(--transition-normal)'
         }}
       >
-        <LoginForm />
+        {formComponent}
       </div>
     );
   }
@@ -130,7 +174,7 @@ const AppContent: React.FC = () => {
               <strong style={{ color: 'var(--accent-secondary)' }}>{userRole}</strong>
             </div>
             <button 
-              onClick={logout}
+              onClick={() => logout()}
               style={{ 
                 background: 'none', 
                 border: 'none', 

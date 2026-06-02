@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { authApi } from '../../infrastructure/api/client';
+import apiClient, { authApi } from '../../infrastructure/api/client';
 import { useToast } from './ToastContext';
 
 interface AuthContextType {
@@ -8,7 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: (options?: { silent?: boolean }) => void;
   simulateRole: (role: 'Admin' | 'Analyst' | 'Reviewer' | 'invalid') => Promise<void>;
 }
 
@@ -85,12 +85,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [addToast]);
 
-  const logout = useCallback(() => {
+  const logout = useCallback((options?: { silent?: boolean }) => {
     safeRemoveItem('token');
     safeRemoveItem('role');
     setToken(null);
     setUserRole(null);
-    addToast('Logged out successfully.', 'success');
+    if (!options?.silent) {
+      addToast('Logged out successfully.', 'success');
+    }
   }, [addToast]);
 
   const simulateRole = useCallback(async (role: 'Admin' | 'Analyst' | 'Reviewer' | 'invalid') => {
@@ -148,11 +150,50 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Handle initial auto-login in dev mode if session is empty or mock-admin
   useEffect(() => {
     const isTest = typeof window !== 'undefined' && (window as any).process?.env?.NODE_ENV === 'test';
-    if (!isTest && (!token || token.startsWith('mock_'))) {
+    const isPublicRecovery = 
+      typeof window !== 'undefined' && 
+      (window.location.hash === '#forgot-password' || 
+       window.location.hash.startsWith('#reset-password') ||
+       window.location.pathname === '/forgot-password' ||
+       window.location.pathname.startsWith('/reset-password'));
+
+    if (!isTest && !isPublicRecovery && (!token || token.startsWith('mock_'))) {
       // Auto login as admin for smooth developer workflow
       simulateRole('Admin');
     }
   }, []);
+
+  // Intercept 401 Unauthorized responses to immediately log the user out and redirect to #login
+  useEffect(() => {
+    if (!apiClient?.interceptors?.response) {
+      return;
+    }
+
+    const interceptor = apiClient.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          const url = error.config?.url || '';
+          // Avoid redirecting on public endpoints that return 401 for validation/bad auth attempts
+          const isPublicApi = url.includes('/auth/login') || url.includes('/auth/password-recovery') || url.includes('/auth/reset-password');
+          
+          if (!isPublicApi) {
+            logout({ silent: true });
+            addToast('Session expired or unauthorized. Please log in again.', 'error');
+            window.location.hash = '#login';
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      if (apiClient?.interceptors?.response) {
+        apiClient.interceptors.response.eject(interceptor);
+      }
+    };
+  }, [logout, addToast]);
+
 
   return (
     <AuthContext.Provider
