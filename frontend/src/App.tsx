@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, UserCheck, Key, ShieldAlert, LogOut } from 'lucide-react';
+import { LayoutDashboard, UserCheck, Key, ShieldAlert, LogOut, Package } from 'lucide-react';
 import { ToastProvider } from './application/context/ToastContext';
 import { AuthProvider, useAuth } from './application/context/AuthContext';
 import { ThemeProvider } from './application/context/ThemeContext';
@@ -8,6 +8,7 @@ import { UserRegistrationContainer } from './presentation/components/UserRegistr
 import { LoginForm } from './presentation/components/LoginForm';
 import { ForgotPasswordView } from './presentation/components/ForgotPasswordView';
 import { ResetPasswordView } from './presentation/components/ResetPasswordView';
+import { ProductCatalogContainer } from './presentation/components/ProductCatalogContainer';
 
 const AppContent: React.FC = () => {
   const { userRole, isAuthenticated, logout, simulateRole } = useAuth();
@@ -61,10 +62,10 @@ const AppContent: React.FC = () => {
         window.location.hash = '#login';
       }
     } else {
-      // Authenticated users on the login gate are redirected to onboarding.
+      // Authenticated users on the login gate are redirected to onboarding or product catalog depending on their role.
       // Public recovery screens should remain fully accessible without forcing layout wrappers.
       if (currentPath === '#login') {
-        window.location.hash = '#register';
+        window.location.hash = userRole === 'Admin' ? '#register' : '#products';
       }
     }
   }, [isAuthenticated, currentPath]);
@@ -109,10 +110,18 @@ const AppContent: React.FC = () => {
 
         <nav style={{ marginTop: '1.5rem', flexGrow: 1 }}>
           <ul className="nav-list">
+            {userRole === 'Admin' && (
+              <li>
+                <a href="#register" className={`nav-item ${currentPath === '#register' ? 'active' : ''}`}>
+                  <UserCheck size={18} />
+                  <span>Onboarding Form</span>
+                </a>
+              </li>
+            )}
             <li>
-              <a href="#register" className={`nav-item ${currentPath === '#register' ? 'active' : ''}`}>
-                <UserCheck size={18} />
-                <span>Onboarding Form</span>
+              <a href="#products" className={`nav-item ${currentPath === '#products' ? 'active' : ''}`}>
+                <Package size={18} />
+                <span>Product Catalog</span>
               </a>
             </li>
           </ul>
@@ -197,7 +206,32 @@ const AppContent: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {userRole === 'Admin' ? (
+        {currentPath === '#products' ? (
+          userRole === 'Admin' || userRole === 'Analyst' ? (
+            <ProductCatalogContainer />
+          ) : (
+            <div style={{ maxWidth: '600px', margin: '6rem auto', textAlign: 'center' }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--error)',
+                margin: '0 auto 1.5rem auto',
+                border: '1px solid rgba(239, 68, 68, 0.2)'
+              }}>
+                <ShieldAlert size={32} />
+              </div>
+              <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.5rem' }}>Access Restrained</h2>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>
+                The product catalog management system is restricted to accounts with <strong>Admin</strong> or <strong>Analyst</strong> privileges.
+              </p>
+            </div>
+          )
+        ) : currentPath === '#register' && userRole === 'Admin' ? (
           <UserRegistrationContainer />
         ) : (
           <div style={{ maxWidth: '600px', margin: '6rem auto', textAlign: 'center' }}>

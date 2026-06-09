@@ -42,6 +42,8 @@
 
   --ambient-before: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
   --ambient-after: radial-gradient(circle, rgba(168, 85, 247, 0.06) 0%, transparent 70%);
+  --input-bg: rgba(17, 24, 39, 0.5);
+  --input-bg-focus: rgba(17, 24, 39, 0.8);
 }
 
 /* Color Palette - Light Mode Overrides */
@@ -64,6 +66,8 @@
 
   --ambient-before: radial-gradient(circle, rgba(99, 102, 241, 0.04) 0%, transparent 70%);
   --ambient-after: radial-gradient(circle, rgba(168, 85, 247, 0.03) 0%, transparent 70%);
+  --input-bg: #ffffff;
+  --input-bg-focus: #ffffff;
 }
 
 /* Base Styles */
@@ -259,7 +263,7 @@ h1, h2, h3, h4, h5, h6 {
 .form-input {
   width: 100%;
   padding: 0.85rem 1rem 0.85rem 2.75rem;
-  background-color: rgba(17, 24, 39, 0.5);
+  background-color: var(--input-bg);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -272,7 +276,7 @@ h1, h2, h3, h4, h5, h6 {
 .form-input:focus {
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 3px var(--accent-glow);
-  background-color: rgba(17, 24, 39, 0.8);
+  background-color: var(--input-bg-focus);
 }
 
 .form-input:focus + .input-icon {

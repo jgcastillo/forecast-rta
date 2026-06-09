@@ -43,3 +43,24 @@ export interface ResetPasswordPayload {
   token: string;
   new_password: string;
 }
+
+export interface ProductCreate {
+  code: string;
+  description: string;
+  qty_per_box: number;
+  exworks_price: string; // Serialised as numeric string
+  series: string;
+  shipping_route: string;
+}
+
+export interface ProductResponse {
+  id: string;
+  code: string;
+  description: string;
+  qty_per_box: number;
+  exworks_price: string;
+  series: string;
+  shipping_route: string;
+  is_active: boolean;
+  created_at: string;
+}

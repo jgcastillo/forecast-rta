@@ -36,6 +36,21 @@
 - [x] **IDE Config:** `ANTIGRAVITY.md` created for context persistence.
 - [x] **Infrastructure:** Docker Compose launched successfully (db, api, web).
 
+## [2026-06-09] - Product Registration (US-05) API & UI Implementation
+
+**Status**: 100% COMPLETE (All Backend, Frontend, and Test phases verified).
+
+### Accomplishments:
+- **Database Model & Migrations**: Created the `Product` database model in `src/catalog/domain/models.py` with SQLAlchemy check constraints to guarantee database-level safety. Registered the model in test configs and migration env.py, and generated/applied Alembic migration `e0faaded3e73_create_products_table.py` successfully.
+- **Backend API Routes**: Built the `POST /api/v1/products` API endpoint protected by `role:analyst` scope (accessible to Admins and Analysts). Implemented early duplicate code lookups to return 409 Conflict, automated reactivations for soft-deleted (inactive) products, and atomic session commits saving both Product and AuditLog (`PRODUCT_CREATED`/`PRODUCT_REACTIVATED`) records in a single transaction block. Refactored routing structure to load all endpoint groups via a unified `api_router.py` master router, keeping `main.py` focused strictly on application startup and CORS.
+- **Pydantic Validation**: Created `ProductCreate` input validation and `ProductResponse` output schemas in `src/catalog/infrastructure/api/schemas.py`, utilizing Pydantic decorators and `@field_serializer` to format the exworks price to a precise string with exactly two decimal places.
+- **Frontend Axios Network Connection**: Extended Axios client in `client.ts` with `catalogApi.registerProduct` request and added corresponding type contracts in `types.ts`.
+- **Custom React State Hook**: Implemented `useRegisterProduct.ts` state hook verifying input format requirements (positive integer quantities, numeric decimal price constraints, trailing/leading whitespace trims).
+- **Presentation Views**: Designed a stunning and responsive `ProductRegistrationForm` complying with the 'Anti-AI Slop' styling rules (distinct typography, Outfit headers, custom inputs with Lucide icons, live error feedbacks, and success toasts). Wrapped it inside a dashboard layout parent `ProductCatalogContainer` and integrated it with sidebar navigation routes (`#products`) and authentication redirects. Fixed a visibility bug in Light Mode by introducing global theme-aware CSS input variables, ensuring input backgrounds and texts are readable in both dark and light modes.
+- **Quality Assurance & Verification**: Created 8 integration tests verifying all validation constraints, collision handling, and RBAC security in `test_register_product.py`. Verified that all 42 backend tests and 12 frontend tests pass successfully, and the frontend builds/compiles without errors.
+
+---
+
 ## [2026-06-02] - Password Reset (US-04) API & UI Implementation
 
 **Status**: 100% COMPLETE (All Backend, Frontend, and Test phases verified).

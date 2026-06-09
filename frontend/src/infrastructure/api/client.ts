@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserCreate, UserResponse, LoginCredentials, TokenResponse, UserUpdate, ResetPasswordPayload } from './types';
+import { UserCreate, UserResponse, LoginCredentials, TokenResponse, UserUpdate, ResetPasswordPayload, ProductCreate, ProductResponse } from './types';
 
 // Create an Axios instance with base url pointing to proxied backend endpoint
 const apiClient = axios.create({
@@ -55,6 +55,13 @@ export const authApi = {
   },
   resetPassword: async (payload: ResetPasswordPayload): Promise<{ detail: string }> => {
     const response = await apiClient.post<{ detail: string }>('/auth/reset-password', payload);
+    return response.data;
+  },
+};
+
+export const catalogApi = {
+  registerProduct: async (payload: ProductCreate): Promise<ProductResponse> => {
+    const response = await apiClient.post<ProductResponse>('/products', payload);
     return response.data;
   },
 };

@@ -11,6 +11,7 @@ from alembic import context
 # Import models to register them on SQLModel.metadata
 from auth.infrastructure.db.models import User
 from auth.infrastructure.db.models_audit import AuditLog
+from catalog.domain.models import Product
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
