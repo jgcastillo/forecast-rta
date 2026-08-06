@@ -1,5 +1,17 @@
 import axios from 'axios';
-import { UserCreate, UserResponse, LoginCredentials, TokenResponse, UserUpdate, ResetPasswordPayload, ProductCreate, ProductResponse } from './types';
+import {
+  UserCreate,
+  UserResponse,
+  LoginCredentials,
+  TokenResponse,
+  UserUpdate,
+  ResetPasswordPayload,
+  ProductCreate,
+  ProductUpdate,
+  ProductFilterParams,
+  ProductResponse,
+  PaginatedProductResponse
+} from './types';
 
 // Create an Axios instance with base url pointing to proxied backend endpoint
 const apiClient = axios.create({
@@ -9,7 +21,7 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor to dynamically inject the Admin JWT token from local storage
+// Request interceptor to dynamically inject the JWT token from local storage
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -62,6 +74,14 @@ export const authApi = {
 export const catalogApi = {
   registerProduct: async (payload: ProductCreate): Promise<ProductResponse> => {
     const response = await apiClient.post<ProductResponse>('/products', payload);
+    return response.data;
+  },
+  updateProduct: async (id: string, payload: ProductUpdate): Promise<ProductResponse> => {
+    const response = await apiClient.patch<ProductResponse>(`/products/${id}`, payload);
+    return response.data;
+  },
+  getProducts: async (params?: ProductFilterParams): Promise<PaginatedProductResponse> => {
+    const response = await apiClient.get<PaginatedProductResponse>('/products', { params });
     return response.data;
   },
 };

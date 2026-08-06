@@ -36,6 +36,29 @@
 - [x] **IDE Config:** `ANTIGRAVITY.md` created for context persistence.
 - [x] **Infrastructure:** Docker Compose launched successfully (db, api, web).
 
+## [2026-08-06] - Catalog Management (US-06 & US-07) Full API & UI Implementation
+
+**Status**: 100% COMPLETE (All Backend, Frontend, and Test phases verified).
+
+### Accomplishments:
+- **Git Branch Workflow**: Developed on feature branch `feature/catalog-us06-us07-management`.
+- **SSOT Data Model & Governance**: Established `.specify/modules/02_catalog/data_model.md` and 12 governance files across `US06_modify_product` and `US07_consult_catalog`.
+- **Backend Endpoints (Python 3.13 / FastAPI / SQLModel)**:
+  - `PATCH /api/v1/products/{product_id}`: Implemented partial updates, SKU code uniqueness validation (`409 Conflict`), soft deletion (`is_active=False`), and atomic transaction commits creating `PRODUCT_UPDATED` / `PRODUCT_DEACTIVATED` `AuditLog` records. Protected by `role:analyst` scope.
+  - `GET /api/v1/products`: Implemented paginated queries (`ProductFilterParams`, `PaginatedProductResponse`), 300ms debounced search matching code or description (`ilike`), filters by series, shipping route, and status, with dynamic sorting (`sort_by`, `sort_order`). Accessible to `role:reviewer`.
+- **Frontend Presentation & Hooks (React 18 / TypeScript / Tailwind CSS)**:
+  - Extended network layer in `client.ts` with `catalogApi.updateProduct` and `catalogApi.getProducts`.
+  - Developed custom state hooks `useProductCatalog.ts` (debounced search, filters, pagination) and `useEditProduct.ts` (field validation, delta updates).
+  - Built `ProductCatalogTable` with Outfit typography, status badges, dynamic sorting, and filter toolbar complying with 'Anti-AI Slop' aesthetics.
+  - Built `EditProductSlideOver` drawer panel for real-time attribute editing, active status toggle, and RBAC visibility controls.
+  - Integrated all components in `ProductCatalogContainer` with success toasts and registration modals.
+- **Quality Assurance & Verification**:
+  - **Pytest (Backend)**: 55/55 passed (13 new integration tests added for US-06 and US-07).
+  - **Vitest (Frontend)**: 18/18 passed (6 new component tests added).
+  - **Build**: `vite build` completed cleanly with 0 TypeScript/compilation errors.
+
+---
+
 ## [2026-06-09] - Product Registration (US-05) API & UI Implementation
 
 **Status**: 100% COMPLETE (All Backend, Frontend, and Test phases verified).

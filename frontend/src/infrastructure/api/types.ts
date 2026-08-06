@@ -53,6 +53,27 @@ export interface ProductCreate {
   shipping_route: string;
 }
 
+export interface ProductUpdate {
+  code?: string;
+  description?: string;
+  qty_per_box?: number;
+  exworks_price?: string;
+  series?: string;
+  shipping_route?: string;
+  is_active?: boolean;
+}
+
+export interface ProductFilterParams {
+  search?: string;
+  series?: string;
+  shipping_route?: string;
+  is_active?: boolean;
+  page?: number;
+  page_size?: number;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
+}
+
 export interface ProductResponse {
   id: string;
   code: string;
@@ -63,4 +84,12 @@ export interface ProductResponse {
   shipping_route: string;
   is_active: boolean;
   created_at: string;
+}
+
+export interface PaginatedProductResponse {
+  items: ProductResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
 }
