@@ -21,12 +21,20 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor to dynamically inject the JWT token from local storage
+// Request interceptor to dynamically inject the JWT token from local storage only if valid (3 segments)
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    const token = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('token') : null;
+    if (
+      token &&
+      token !== 'undefined' &&
+      token !== 'null' &&
+      token.trim() !== '' &&
+      token.split('.').length === 3
+    ) {
       config.headers.Authorization = `Bearer ${token}`;
+    } else if (config.headers) {
+      delete config.headers.Authorization;
     }
     return config;
   },

@@ -33,14 +33,25 @@ const safeRemoveItem = (key: string): void => {
   }
 };
 
+const getInitialValidToken = (): string | null => {
+  const t = safeGetItem('token');
+  if (t && t !== 'undefined' && t !== 'null' && t.trim() !== '' && t.split('.').length === 3) {
+    return t;
+  }
+  safeRemoveItem('token');
+  safeRemoveItem('role');
+  return null;
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(safeGetItem('token'));
-  const [userRole, setUserRole] = useState<string | null>(safeGetItem('role'));
+  const [token, setToken] = useState<string | null>(getInitialValidToken());
+  const [userRole, setUserRole] = useState<string | null>(token ? safeGetItem('role') : null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { addToast } = useToast();
 
   const decodeJwtRole = (jwtToken: string): { role: string; email: string } | null => {
     try {
+      if (jwtToken.split('.').length !== 3) return null;
       const base64Url = jwtToken.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(
@@ -97,7 +108,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const simulateRole = useCallback(async (role: 'Admin' | 'Analyst' | 'Reviewer' | 'invalid') => {
     if (role === 'invalid') {
-      const invalidToken = 'invalid_expired_jwt_token';
+      const invalidToken = 'invalid.expired.jwt';
       safeSetItem('token', invalidToken);
       safeSetItem('role', 'Admin');
       setToken(invalidToken);
@@ -131,19 +142,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       addToast(`Development Simulation: Authenticated as ${resolvedRole}.`, 'success');
     } catch (err) {
       console.error(`Failed to simulate ${role} login:`, err);
-      // Fallback if backend is unreachable
-      const mockToken = `mock_jwt_token_for_${role.toLowerCase()}`;
-      safeSetItem('token', mockToken);
-      safeSetItem('role', role);
-      setToken(mockToken);
-      setUserRole(role);
-      addToast(`Simulated Session: Logged in as ${role} (Mock fallback)`, 'success');
+      safeRemoveItem('token');
+      safeRemoveItem('role');
+      setToken(null);
+      setUserRole(null);
+      addToast(`Unable to authenticate simulated session for ${role}. Please log in manually.`, 'error');
     } finally {
       setIsLoading(false);
     }
   }, [addToast]);
 
-  // Handle initial auto-login in dev mode if session is empty or mock
+  // Handle initial auto-login in dev mode if token is missing
   useEffect(() => {
     const isTest = typeof window !== 'undefined' && (window as any).process?.env?.NODE_ENV === 'test';
     const isPublicRecovery = 
@@ -153,12 +162,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
        window.location.pathname === '/forgot-password' ||
        window.location.pathname.startsWith('/reset-password'));
 
-    if (!isTest && !isPublicRecovery && (!token || token.startsWith('mock_'))) {
+    if (!isTest && !isPublicRecovery && !token) {
       simulateRole('Admin');
     }
   }, []);
 
-  // Intercept 401 Unauthorized responses to immediately log the user out and redirect to #login
+  // Intercept 401 Unauthorized responses to immediately clean local session and redirect to #login
   useEffect(() => {
     if (!apiClient?.interceptors?.response) {
       return;

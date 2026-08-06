@@ -58,8 +58,7 @@
   - **Network Error Resolution & CORS Fix**:
   - **CORS Middleware**: Updated FastAPI `CORSMiddleware` in `main.py` adding explicit origins and expanded regex `r"^https?://(localhost|127\.0\.0\.1|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$"` to dynamically authorize Docker bridge container IPs (`172.x.x.x`) and local network adapters, resolving CORS preflight OPTIONS `400 Bad Request` failures.
   - **Vite Proxy & Base URL**: Fixed proxy rewrite rule in `vite.config.ts` to preserve `/api/v1` pathing without stripping prefixes.
-  - **JWT Dev Seeding & Simulation**: Updated `seeding.py` to idempotently seed default dev accounts (`admin@admin.com`, `analyst@admin.com`, `reviewer@admin.com`) and updated `AuthContext.tsx` to issue valid signed JWT tokens during role simulation.
-  - **Hook Error Handling**: Enhanced `useProductCatalog.ts` to log detailed response payloads and clean error states on success.
+  - **JWT Interceptor Fix ("Not enough segments")**: Updated Axios request interceptor in `client.ts` to strictly validate 3-segment JWT strings (`token.split('.').length === 3`) before appending `Authorization: Bearer <token>`, purging malformed mock tokens from headers. Updated `AuthContext.tsx` initialization to clear invalid tokens on startup and redirect 401s cleanly to `#login`.
 
 ---
 
