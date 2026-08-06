@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { catalogApi } from '../../infrastructure/api/client';
 import { ProductResponse, ProductFilterParams } from '../../infrastructure/api/types';
 
@@ -81,9 +81,12 @@ export const useProductCatalog = (initialPageSize: number = 10): UseProductCatal
       setProducts(response.items);
       setTotal(response.total);
       setTotalPages(response.total_pages);
+      setError(null);
     } catch (err: any) {
-      const msg = err.response?.data?.detail || err.message || 'Failed to fetch catalog products';
-      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+      console.error('Catalog fetch error:', err.response?.data || err.message || err);
+      const detail = err.response?.data?.detail;
+      const msg = typeof detail === 'string' ? detail : err.message || 'Failed to fetch catalog products';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
