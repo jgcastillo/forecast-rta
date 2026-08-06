@@ -56,7 +56,7 @@
   - **Pytest (Backend)**: 55/55 passed (13 new integration tests added for US-06 and US-07).
   - **Vitest (Frontend)**: 18/18 passed (6 new component tests added).
   - **Network Error Resolution & CORS Fix**:
-  - **CORS Middleware**: Updated FastAPI `CORSMiddleware` in `main.py` adding explicit origins `http://127.0.0.1:5173`, `http://127.0.0.1:5174`, `http://127.0.0.1:5175`, `http://localhost:3000` and `allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?"` to prevent browser preflight options rejection when accessing via 127.0.0.1 or non-5173 ports.
+  - **CORS Middleware**: Updated FastAPI `CORSMiddleware` in `main.py` adding explicit origins and expanded regex `r"^https?://(localhost|127\.0\.0\.1|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$"` to dynamically authorize Docker bridge container IPs (`172.x.x.x`) and local network adapters, resolving CORS preflight OPTIONS `400 Bad Request` failures.
   - **Vite Proxy & Base URL**: Fixed proxy rewrite rule in `vite.config.ts` to preserve `/api/v1` pathing without stripping prefixes.
   - **JWT Dev Seeding & Simulation**: Updated `seeding.py` to idempotently seed default dev accounts (`admin@admin.com`, `analyst@admin.com`, `reviewer@admin.com`) and updated `AuthContext.tsx` to issue valid signed JWT tokens during role simulation.
   - **Hook Error Handling**: Enhanced `useProductCatalog.ts` to log detailed response payloads and clean error states on success.

@@ -23,7 +23,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for local development and integration
+# Enable CORS for local development, docker bridges, and integration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -36,7 +36,8 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ],
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
+    # Expanded regex to allow localhost, 127.0.0.1 and any private IP network (172.x.x.x, 192.168.x.x, 10.x.x.x)
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
