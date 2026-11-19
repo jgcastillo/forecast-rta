@@ -36,6 +36,24 @@
 - [x] **IDE Config:** `ANTIGRAVITY.md` created for context persistence.
 - [x] **Infrastructure:** Docker Compose launched successfully (db, api, web).
 
+## [2026-11-19] - Catalog Domain Refinement & Seeding Specification (US-05a)
+
+**Status**: IN PROGRESS (Governance & Specification Phase).
+
+### Accomplishments:
+- **Stakeholder Excel Analysis**: Analyzed real operational workbooks in `docs/originals/` (`Forecast Serie 2-3 al 28-2-26B_202603.xlsx` and `Forecast Serie 4 28-2-26 -v2_202603.xlsx`). Identified ~140 active products, series divisions (`SPECIAL`, `SERIE 2`, `SERIE 3`, `SERIE 4`), packaging edge cases (`NO SUPPLIES` or missing quantities mapped to default `1`), MPS box attributes, material classifications (`IP`, `OMP`), press models (`10K`, `20K`, `BOTH`), and operational safety buffer notes.
+- **SSOT Data Model Specification**: Authored `.specify/modules/02_catalog/US05_a_data_model/data_model.md` defining the complete schema evolution for `Product`, SQLModel mapping, PostgreSQL check constraints, and ETL transformation rules.
+- **Feature Specification**: Authored `.specify/modules/02_catalog/US05_a_data_model/spec.md` formalizing User Stories (P1: Entity evolution, P2: Normalization service, P3: Idempotent seeding CLI), edge cases, functional requirements, and measurable success criteria under Elite SDD methodology.
+- **Implementation Plan**: Authored and updated `.specify/modules/02_catalog/US05_a_data_model/plan.md` defining the 4-phase execution roadmap, hexagonal layout (Domain/Application/Infrastructure), standard-library Excel extraction engine, and strict regression protocol (zero modification of legacy tests without explicit prior user approval). Approved by user.
+- **TDD Tasks Breakdown**: Authored `.specify/modules/02_catalog/US05_a_data_model/tasks.md` detailing atomic TDD tasks (T072 to T090) organized by User Story and Phase with strict regression gates.
+- **Governance**: Zero code modifications performed pending user review and formal approval of `tasks.md`.
+
+### Next Steps:
+- Await user approval on `tasks.md`.
+- Execute implementation following strict TDD order starting with baseline test verification (T072).
+
+---
+
 ## [2026-06-09] - Product Registration (US-05) API & UI Implementation
 
 **Status**: 100% COMPLETE (All Backend, Frontend, and Test phases verified).
