@@ -51,6 +51,29 @@
 ### Next Steps:
 - Await user approval on `tasks.md`.
 - Execute implementation following strict TDD order starting with baseline test verification (T072).
+## [2026-08-06] - Catalog Management (US-06 & US-07) Full API & UI Implementation
+
+**Status**: 100% COMPLETE (All Backend, Frontend, and Test phases verified).
+
+### Accomplishments:
+- **Git Branch Workflow**: Developed on feature branch `feature/catalog-us06-us07-management`.
+- **SSOT Data Model & Governance**: Established `.specify/modules/02_catalog/data_model.md` and 12 governance files across `US06_modify_product` and `US07_consult_catalog`.
+- **Backend Endpoints (Python 3.13 / FastAPI / SQLModel)**:
+  - `PATCH /api/v1/products/{product_id}`: Implemented partial updates, SKU code uniqueness validation (`409 Conflict`), soft deletion (`is_active=False`), and atomic transaction commits creating `PRODUCT_UPDATED` / `PRODUCT_DEACTIVATED` `AuditLog` records. Protected by `role:analyst` scope.
+  - `GET /api/v1/products`: Implemented paginated queries (`ProductFilterParams`, `PaginatedProductResponse`), 300ms debounced search matching code or description (`ilike`), filters by series, shipping route, and status, with dynamic sorting (`sort_by`, `sort_order`). Accessible to `role:reviewer`.
+- **Frontend Presentation & Hooks (React 18 / TypeScript / Tailwind CSS)**:
+  - Extended network layer in `client.ts` with `catalogApi.updateProduct` and `catalogApi.getProducts`.
+  - Developed custom state hooks `useProductCatalog.ts` (debounced search, filters, pagination) and `useEditProduct.ts` (field validation, delta updates).
+  - Built `ProductCatalogTable` with Outfit typography, status badges, dynamic sorting, and filter toolbar complying with 'Anti-AI Slop' aesthetics.
+  - Built `EditProductSlideOver` drawer panel for real-time attribute editing, active status toggle, and RBAC visibility controls.
+  - Integrated all components in `ProductCatalogContainer` with success toasts and registration modals.
+- **Quality Assurance & Verification**:
+  - **Pytest (Backend)**: 55/55 passed (13 new integration tests added for US-06 and US-07).
+  - **Vitest (Frontend)**: 18/18 passed (6 new component tests added).
+  - **Network Error Resolution & CORS Fix**:
+  - **CORS Middleware**: Updated FastAPI `CORSMiddleware` in `main.py` adding explicit origins and expanded regex `r"^https?://(localhost|127\.0\.0\.1|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$"` to dynamically authorize Docker bridge container IPs (`172.x.x.x`) and local network adapters, resolving CORS preflight OPTIONS `400 Bad Request` failures.
+  - **Vite Proxy & Base URL**: Fixed proxy rewrite rule in `vite.config.ts` to preserve `/api/v1` pathing without stripping prefixes.
+  - **JWT Interceptor Fix ("Not enough segments")**: Updated Axios request interceptor in `client.ts` to strictly validate 3-segment JWT strings (`token.split('.').length === 3`) before appending `Authorization: Bearer <token>`, purging malformed mock tokens from headers. Updated `AuthContext.tsx` initialization to clear invalid tokens on startup and redirect 401s cleanly to `#login`.
 
 ---
 

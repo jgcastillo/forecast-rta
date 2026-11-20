@@ -1,251 +1,352 @@
----
-
-description: "Task list template for feature implementation"
----
-
 # Tasks: [FEATURE NAME]
 
-**Input**: Design documents from `/specs/[###-feature-name]/`
-**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
-
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
-
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
-
-## Format: `[ID] [P?] [Story] Description`
-
-- **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
-- Include exact file paths in descriptions
-
-## Path Conventions
-
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
-
-<!-- 
-  ============================================================================
-  IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
-  
-  The /speckit.tasks command MUST replace these with actual tasks based on:
-  - User stories from spec.md (with their priorities P1, P2, P3...)
-  - Feature requirements from plan.md
-  - Entities from data-model.md
-  - Endpoints from contracts/
-  
-  Tasks MUST be organized by user story so each story can be:
-  - Implemented independently
-  - Tested independently
-  - Delivered as an MVP increment
-  
-  DO NOT keep these sample tasks in the generated tasks.md file.
-  ============================================================================
--->
-
-## Phase 1: Setup (Shared Infrastructure)
-
-**Purpose**: Project initialization and basic structure
-
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+**Feature ID:** [FEATURE_ID]
+**Status:** DRAFT
+**Created:** [DATE]
+**Last Updated:** [DATE]
 
 ---
 
-## Phase 2: Foundational (Blocking Prerequisites)
+## 1. Purpose
 
-**Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
+This document defines the atomic execution tasks required to implement the approved feature.
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
+Tasks MUST derive from the approved specification and plan.
 
-Examples of foundational tasks (adjust based on your project):
+They MUST NOT introduce:
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
-
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+- new business rules;
+- new feature scope;
+- unresolved assumptions;
+- architectural decisions not present in the approved plan.
 
 ---
 
-## Phase 3: User Story 1 - [Title] (Priority: P1) 🎯 MVP
+## 2. References
 
-**Goal**: [Brief description of what this story delivers]
+### Normative
 
-**Independent Test**: [How to verify this story works on its own]
+- Constitution: `.specify/memory/constitution.md`
+- Specification: `[PATH_TO_SPEC]`
+- Business Rules:
+  - [BR-XXX]
+- ADRs:
+  - [ADR-XXX OR N/A]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### Derivative
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
-
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
-
-### Implementation for User Story 1
-
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
-
-**Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
+- Plan: `[PATH_TO_PLAN]`
+- Data Model: [PATH OR N/A]
+- Technical Contracts: [PATH OR N/A]
 
 ---
 
-## Phase 4: User Story 2 - [Title] (Priority: P2)
+## 3. Task Format
 
-**Goal**: [Brief description of what this story delivers]
+Use:
 
-**Independent Test**: [How to verify this story works on its own]
+`- [ ] TXXX [TYPE] [TRACE] Description in exact/path/to/file`
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### Types
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- `[TEST]`
+- `[DOMAIN]`
+- `[APP]`
+- `[INFRA]`
+- `[DB]`
+- `[MIGRATION]`
+- `[API]`
+- `[UI]`
+- `[CONTRACT]`
+- `[REFACTOR]`
+- `[VERIFY]`
+- `[DOC]`
 
-### Implementation for User Story 2
+### Traceability
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+Use applicable identifiers:
 
-**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
+- `[BR-XXX]`
+- `[FR-XXX]`
+- `[AC-XXX]`
+- `[INV-XXX]`
+- `[ADR-XXX]`
 
----
+Example:
 
-## Phase 5: User Story 3 - [Title] (Priority: P3)
+`- [ ] T012 [TEST] [BR-014][AC-003] Add failing availability calculation test in backend/tests/planning/domain/test_availability.py`
 
-**Goal**: [Brief description of what this story delivers]
-
-**Independent Test**: [How to verify this story works on its own]
-
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
-
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
-
-### Implementation for User Story 3
-
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
-
-**Checkpoint**: All user stories should now be independently functional
+Tasks MUST be atomic and objectively verifiable.
 
 ---
 
-[Add more user story phases as needed, following the same pattern]
+## 4. TDD Rule
+
+Production behavior MUST follow:
+
+1. write the relevant failing test;
+2. confirm it fails for the expected reason;
+3. implement the minimum behavior;
+4. confirm the test passes;
+5. run affected regression tests;
+6. refactor while tests remain green.
+
+Tests are mandatory.
+
+Production behavior MUST NOT be implemented before its corresponding test unless an explicitly approved exception exists.
 
 ---
 
-## Phase N: Polish & Cross-Cutting Concerns
+## 5. Pre-Implementation
 
-**Purpose**: Improvements that affect multiple user stories
+- [ ] T001 [VERIFY] Confirm `spec.md` status is `APPROVED`.
+- [ ] T002 [VERIFY] Confirm `plan.md` status is `APPROVED`.
+- [ ] T003 [VERIFY] Confirm no blocking open question applies.
+- [ ] T004 [VERIFY] Confirm required business rules are validated.
+- [ ] T005 [VERIFY] Confirm required ADRs are accepted.
+- [ ] T006 [VERIFY] Confirm the expected Git branch and working-tree state.
+- [ ] T007 [VERIFY] Run relevant existing tests and record the baseline result.
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
-
----
-
-## Dependencies & Execution Order
-
-### Phase Dependencies
-
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3+)**: All depend on Foundational phase completion
-  - User stories can then proceed in parallel (if staffed)
-  - Or sequentially in priority order (P1 → P2 → P3)
-- **Polish (Final Phase)**: Depends on all desired user stories being complete
-
-### User Story Dependencies
-
-- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
-- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - May integrate with US1 but should be independently testable
-- **User Story 3 (P3)**: Can start after Foundational (Phase 2) - May integrate with US1/US2 but should be independently testable
-
-### Within Each User Story
-
-- Tests (if included) MUST be written and FAIL before implementation
-- Models before services
-- Services before endpoints
-- Core implementation before integration
-- Story complete before moving to next priority
-
-### Parallel Opportunities
-
-- All Setup tasks marked [P] can run in parallel
-- All Foundational tasks marked [P] can run in parallel (within Phase 2)
-- Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
-- All tests for a user story marked [P] can run in parallel
-- Models within a story marked [P] can run in parallel
-- Different user stories can be worked on in parallel by different team members
+**Checkpoint:** Stop if any blocking governance conflict exists.
 
 ---
 
-## Parallel Example: User Story 1
+## 6. Domain
 
-```bash
-# Launch all tests for User Story 1 together (if tests requested):
-Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
-Task: "Integration test for [user journey] in tests/integration/test_[name].py"
+Include only when business logic exists.
 
-# Launch all models for User Story 1 together:
-Task: "Create [Entity1] model in src/models/[entity1].py"
-Task: "Create [Entity2] model in src/models/[entity2].py"
-```
+### [BEHAVIOR / RULE]
 
----
+- [ ] T0XX [TEST] [BR-XXX][AC-XXX] Add failing domain test in `[TEST_PATH]`.
+- [ ] T0XX [VERIFY] Run the test and confirm expected failure.
+- [ ] T0XX [DOMAIN] [BR-XXX] Implement minimum behavior in `[SOURCE_PATH]`.
+- [ ] T0XX [VERIFY] Confirm the new test passes.
 
-## Implementation Strategy
+Repeat for each independent business behavior.
 
-### MVP First (User Story 1 Only)
+After domain implementation:
 
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
-3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Test User Story 1 independently
-5. Deploy/demo if ready
+- [ ] T0XX [VERIFY] Run affected domain tests.
+- [ ] T0XX [REFACTOR] Refactor if needed while keeping tests green.
 
-### Incremental Delivery
-
-1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
-5. Each story adds value without breaking previous stories
-
-### Parallel Team Strategy
-
-With multiple developers:
-
-1. Team completes Setup + Foundational together
-2. Once Foundational is done:
-   - Developer A: User Story 1
-   - Developer B: User Story 2
-   - Developer C: User Story 3
-3. Stories complete and integrate independently
+**Checkpoint:** Core business behavior is independently testable without infrastructure.
 
 ---
 
-## Notes
+## 7. Application
 
-- [P] tasks = different files, no dependencies
-- [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable
-- Verify tests fail before implementing
-- Commit after each task or logical group
-- Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+Include only when use-case orchestration is required.
+
+### [USE CASE]
+
+- [ ] T0XX [TEST] [FR-XXX][AC-XXX] Add failing application test in `[TEST_PATH]`.
+- [ ] T0XX [VERIFY] Confirm expected failure.
+- [ ] T0XX [APP] [FR-XXX] Implement use case in `[SOURCE_PATH]`.
+- [ ] T0XX [APP] [FR-XXX] Add or modify required ports in `[PATH]`.
+- [ ] T0XX [VERIFY] Confirm application tests pass.
+
+Business rules MUST NOT be moved from the domain into application orchestration.
+
+---
+
+## 8. Persistence and Migration
+
+Include only when required.
+
+- [ ] T0XX [TEST] [FR-XXX] Add failing persistence/integration test in `[TEST_PATH]`.
+- [ ] T0XX [VERIFY] Confirm expected failure.
+- [ ] T0XX [DB] [FR-XXX] Create or modify persistence model in `[PATH]`.
+- [ ] T0XX [INFRA] [FR-XXX] Implement repository/adapter changes in `[PATH]`.
+- [ ] T0XX [VERIFY] Confirm persistence tests pass.
+
+If schema changes are required:
+
+- [ ] T0XX [MIGRATION] Create Alembic migration for [CHANGE].
+- [ ] T0XX [VERIFY] Review migration for unintended changes.
+- [ ] T0XX [VERIFY] Apply migration in the Docker development environment.
+- [ ] T0XX [VERIFY] Confirm migration succeeds.
+
+Do not create persistence structures for hypothetical future needs.
+
+---
+
+## 9. External Data / Imports
+
+Include only when required.
+
+- [ ] T0XX [TEST] [FR-XXX] Add failing adapter test for valid source input.
+- [ ] T0XX [TEST] [FR-XXX] Add failing adapter test for invalid source input.
+- [ ] T0XX [VERIFY] Confirm expected failures.
+- [ ] T0XX [INFRA] [FR-XXX] Implement source parsing in `[PATH]`.
+- [ ] T0XX [INFRA] [FR-XXX] Implement normalization in `[PATH]`.
+- [ ] T0XX [INFRA] [FR-XXX] Implement validation/rejection handling.
+- [ ] T0XX [VERIFY] Confirm adapter tests pass.
+- [ ] T0XX [VERIFY] Confirm source-specific structures do not leak into the domain.
+
+---
+
+## 10. API
+
+Include only when required.
+
+- [ ] T0XX [TEST] [FR-XXX][AC-XXX] Add failing API/contract test in `[TEST_PATH]`.
+- [ ] T0XX [VERIFY] Confirm expected failure.
+- [ ] T0XX [CONTRACT] [FR-XXX] Create or modify request/response contract in `[PATH]`.
+- [ ] T0XX [API] [FR-XXX] Implement or modify API adapter in `[PATH]`.
+- [ ] T0XX [VERIFY] Confirm API tests pass.
+
+API controllers MUST NOT implement business rules.
+
+---
+
+## 11. Frontend
+
+Include only when required.
+
+- [ ] T0XX [TEST] [AC-XXX] Add failing frontend test in `[TEST_PATH]`.
+- [ ] T0XX [VERIFY] Confirm expected failure.
+- [ ] T0XX [UI] [FR-XXX] Create or modify frontend hook/service in `[PATH]`.
+- [ ] T0XX [UI] [FR-XXX] Create or modify presentation component in `[PATH]`.
+- [ ] T0XX [VERIFY] Confirm frontend tests pass.
+- [ ] T0XX [VERIFY] Run TypeScript checks.
+- [ ] T0XX [VERIFY] Run production build.
+
+Business rules SHOULD NOT live in presentation components.
+
+---
+
+## 12. Human Decision Traceability
+
+Include only when applicable.
+
+- [ ] T0XX [TEST] [AC-XXX] Add failing test proving recommendation and final human decision remain distinguishable.
+- [ ] T0XX [DOMAIN] [BR-XXX] Implement approved adjustment/decision behavior.
+- [ ] T0XX [APP] [FR-XXX] Implement decision recording use case.
+- [ ] T0XX [INFRA] [FR-XXX] Persist required decision history.
+- [ ] T0XX [VERIFY] Confirm required traceability is preserved.
+
+Where required, preserve:
+
+- system recommendation;
+- human adjustment;
+- final decision;
+- responsible actor;
+- timestamp;
+- justification.
+
+---
+
+## 13. Golden / Reference Cases
+
+Include when validated reference cases exist.
+
+- [ ] T0XX [TEST] [BR-XXX] Add golden case `[CASE_ID]`.
+- [ ] T0XX [VERIFY] Confirm calculated result matches validated expected result.
+
+Never change a validated expected result merely to make a test pass.
+
+---
+
+## 14. Final Verification
+
+- [ ] T0XX [VERIFY] Run affected domain tests.
+- [ ] T0XX [VERIFY] Run affected application tests.
+- [ ] T0XX [VERIFY] Run affected integration/API tests.
+- [ ] T0XX [VERIFY] Run affected frontend tests.
+- [ ] T0XX [VERIFY] Run golden tests when applicable.
+- [ ] T0XX [VERIFY] Run the regression scope defined in `plan.md`.
+- [ ] T0XX [VERIFY] Confirm all required tests pass.
+- [ ] T0XX [VERIFY] Confirm architecture matches the approved plan.
+- [ ] T0XX [VERIFY] Confirm no unrelated production behavior was introduced.
+
+---
+
+## 15. Project History
+
+- [ ] T0XX [DOC] Update `.specify/memory/project_log.md` with factual execution results.
+
+The entry should record:
+
+- date;
+- branch;
+- feature;
+- specification and plan used;
+- significant files changed;
+- migrations;
+- tests executed and results;
+- conflicts or unresolved issues;
+- commit reference when available.
+
+Implementation agents MUST NOT modify normative governance unless explicitly authorized.
+
+---
+
+## 16. Execution Conflicts
+
+### EC-001 — [CONFLICT]
+
+**Detected During:** T0XX
+
+**Type:** BUSINESS_RULE | SPECIFICATION | ARCHITECTURE | DATA_MODEL | EXISTING_CODE | TEST | ENVIRONMENT
+
+**Blocking:** YES | NO
+
+**Description:**  
+[DESCRIPTION]
+
+**Resolution:**  
+[REFERENCE / PENDING]
+
+If none:
+
+`None.`
+
+A blocking conflict MUST NOT be resolved through assumption.
+
+---
+
+## 17. Completion Check
+
+Before setting status to `COMPLETED`:
+
+- [ ] All required tasks are complete.
+- [ ] No blocking task or conflict remains.
+- [ ] TDD order was followed.
+- [ ] Required tests pass.
+- [ ] Relevant regression tests pass.
+- [ ] No business rule was invented or duplicated.
+- [ ] No unapproved scope was introduced.
+- [ ] Architecture matches the plan.
+- [ ] Core domain remains infrastructure-independent where required.
+- [ ] Golden/reference cases remain correct where applicable.
+- [ ] No unintended migration was introduced.
+- [ ] `project_log.md` was updated.
+
+---
+
+## 18. Status
+
+**Status:** DRAFT | READY_FOR_REVIEW | APPROVED | IN_PROGRESS | COMPLETED | SUPERSEDED
+
+**Approved By:** [NAME / ROLE / N/A]
+
+**Approval Date:** [DATE / N/A]
+
+**Execution Started:** [DATE / N/A]
+
+**Execution Completed:** [DATE / N/A]
+
+---
+
+## Template Rules
+
+1. Tasks execute an approved `spec.md` and `plan.md`; they do not redefine them.
+2. Use exact repository paths and commands when known.
+3. Keep tasks atomic and verifiable.
+4. Tests precede production behavior.
+5. Reference BR, FR, AC, INV, and ADR identifiers where useful.
+6. Do not implement unresolved business behavior.
+7. Do not introduce architecture or speculative infrastructure.
+8. Omit phases that are genuinely not applicable.
+9. Verification tasks are mandatory.
+10. A task set with blocking conflicts cannot be completed.

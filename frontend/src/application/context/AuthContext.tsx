@@ -33,14 +33,25 @@ const safeRemoveItem = (key: string): void => {
   }
 };
 
+const getInitialValidToken = (): string | null => {
+  const t = safeGetItem('token');
+  if (t && t !== 'undefined' && t !== 'null' && t.trim() !== '' && t.split('.').length === 3) {
+    return t;
+  }
+  safeRemoveItem('token');
+  safeRemoveItem('role');
+  return null;
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(safeGetItem('token'));
-  const [userRole, setUserRole] = useState<string | null>(safeGetItem('role'));
+  const [token, setToken] = useState<string | null>(getInitialValidToken());
+  const [userRole, setUserRole] = useState<string | null>(token ? safeGetItem('role') : null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { addToast } = useToast();
 
   const decodeJwtRole = (jwtToken: string): { role: string; email: string } | null => {
     try {
+      if (jwtToken.split('.').length !== 3) return null;
       const base64Url = jwtToken.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(
@@ -97,7 +108,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const simulateRole = useCallback(async (role: 'Admin' | 'Analyst' | 'Reviewer' | 'invalid') => {
     if (role === 'invalid') {
-      const invalidToken = 'invalid_expired_jwt_token';
+      const invalidToken = 'invalid.expired.jwt';
       safeSetItem('token', invalidToken);
       safeSetItem('role', 'Admin');
       setToken(invalidToken);
@@ -106,48 +117,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
-    if (role === 'Admin') {
-      setIsLoading(true);
-      try {
-        // Attempt real login for development auto-login/simulation
-        const response = await authApi.login({ username: 'admin@admin.com', password: 'admin1234' });
-        if (!response || !response.access_token) {
-          throw new Error('Empty response or missing access_token');
-        }
-        const jwtToken = response.access_token;
-        const decoded = decodeJwtRole(jwtToken);
-        const resolvedRole = decoded ? decoded.role : 'Admin';
-        
-        safeSetItem('token', jwtToken);
-        safeSetItem('role', resolvedRole);
-        setToken(jwtToken);
-        setUserRole(resolvedRole);
-        addToast('Development Simulation: Authenticated with root admin context.', 'success');
-      } catch (err) {
-        console.error('Failed to simulate real admin login:', err);
-        // Fallback to mock behavior if backend is unreachable
-        const mockToken = 'mock_jwt_token_for_admin';
-        safeSetItem('token', mockToken);
-        safeSetItem('role', 'Admin');
-        setToken(mockToken);
-        setUserRole('Admin');
-        addToast('Simulated Session: Logged in as Admin (Mock fallback)', 'success');
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
+    const credentialsMap: Record<string, { email: string; pass: string }> = {
+      Admin: { email: 'admin@admin.com', pass: 'admin1234' },
+      Analyst: { email: 'analyst@admin.com', pass: 'analyst1234' },
+      Reviewer: { email: 'reviewer@admin.com', pass: 'reviewer1234' },
+    };
 
-    // Standard simulation of Analyst or Reviewer
-    const mockToken = `mock_jwt_token_for_${role.toLowerCase()}`;
-    safeSetItem('token', mockToken);
-    safeSetItem('role', role);
-    setToken(mockToken);
-    setUserRole(role);
-    addToast(`Simulated Session: Logged in as ${role}`, 'success');
+    const targetCreds = credentialsMap[role] || credentialsMap.Admin;
+
+    setIsLoading(true);
+    try {
+      const response = await authApi.login({ username: targetCreds.email, password: targetCreds.pass });
+      if (!response || !response.access_token) {
+        throw new Error('Empty response or missing access_token');
+      }
+      const jwtToken = response.access_token;
+      const decoded = decodeJwtRole(jwtToken);
+      const resolvedRole = decoded ? decoded.role : role;
+      
+      safeSetItem('token', jwtToken);
+      safeSetItem('role', resolvedRole);
+      setToken(jwtToken);
+      setUserRole(resolvedRole);
+      addToast(`Development Simulation: Authenticated as ${resolvedRole}.`, 'success');
+    } catch (err) {
+      console.error(`Failed to simulate ${role} login:`, err);
+      safeRemoveItem('token');
+      safeRemoveItem('role');
+      setToken(null);
+      setUserRole(null);
+      addToast(`Unable to authenticate simulated session for ${role}. Please log in manually.`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   }, [addToast]);
 
-  // Handle initial auto-login in dev mode if session is empty or mock-admin
+  // Handle initial auto-login in dev mode if token is missing
   useEffect(() => {
     const isTest = typeof window !== 'undefined' && (window as any).process?.env?.NODE_ENV === 'test';
     const isPublicRecovery = 
@@ -157,13 +162,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
        window.location.pathname === '/forgot-password' ||
        window.location.pathname.startsWith('/reset-password'));
 
-    if (!isTest && !isPublicRecovery && (!token || token.startsWith('mock_'))) {
-      // Auto login as admin for smooth developer workflow
+    if (!isTest && !isPublicRecovery && !token) {
       simulateRole('Admin');
     }
   }, []);
 
-  // Intercept 401 Unauthorized responses to immediately log the user out and redirect to #login
+  // Intercept 401 Unauthorized responses to immediately clean local session and redirect to #login
   useEffect(() => {
     if (!apiClient?.interceptors?.response) {
       return;
@@ -174,7 +178,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       (error) => {
         if (error.response && error.response.status === 401) {
           const url = error.config?.url || '';
-          // Avoid redirecting on public endpoints that return 401 for validation/bad auth attempts
           const isPublicApi = url.includes('/auth/login') || url.includes('/auth/password-recovery') || url.includes('/auth/reset-password');
           
           if (!isPublicApi) {
@@ -193,7 +196,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     };
   }, [logout, addToast]);
-
 
   return (
     <AuthContext.Provider

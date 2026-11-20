@@ -11,7 +11,7 @@ from auth.infrastructure.db.seeding import seed_initial_admin
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan event to manage database seeding and other startup/shutdown behaviors."""
-    # Seed the initial admin account on startup
+    # Seed initial accounts on startup
     with Session(engine) as session:
         seed_initial_admin(session)
     yield
@@ -23,14 +23,21 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for local development and integration
+# Enable CORS for local development, docker bridges, and integration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:5175",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
     ],
+    # Expanded regex to allow localhost, 127.0.0.1 and any private IP network (172.x.x.x, 192.168.x.x, 10.x.x.x)
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

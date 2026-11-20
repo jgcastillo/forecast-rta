@@ -1,101 +1,137 @@
 import React, { useState } from 'react';
-import { Package, ShieldAlert, Circle, HelpCircle } from 'lucide-react';
+import { Package, CheckCircle, Plus, X } from 'lucide-react';
+import { ProductCatalogTable } from './ProductCatalogTable';
 import { ProductRegistrationForm } from './ProductRegistrationForm';
-import { ProductResponse } from '../../infrastructure/api/types';
+import { EditProductSlideOver } from './EditProductSlideOver';
+import { ProductResponse, UserRole } from '../../infrastructure/api/types';
 
-export const ProductCatalogContainer: React.FC = () => {
-  const [lastRegisteredProduct, setLastRegisteredProduct] = useState<ProductResponse | null>(null);
+interface ProductCatalogContainerProps {
+  userRole?: UserRole;
+}
+
+export const ProductCatalogContainer: React.FC<ProductCatalogContainerProps> = ({ userRole = 'Analyst' }) => {
+  const [editingProduct, setEditingProduct] = useState<ProductResponse | null>(null);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState<boolean>(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState<boolean>(false);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+  const canEdit = userRole === 'Admin' || userRole === 'Analyst';
+
+  const handleEditProduct = (product: ProductResponse) => {
+    setEditingProduct(product);
+    setIsEditDrawerOpen(true);
+  };
 
   const handleRegisterSuccess = (newProduct: ProductResponse) => {
-    setLastRegisteredProduct(newProduct);
+    setIsRegisterModalOpen(false);
+    setNotification({
+      message: `Product SKU "${newProduct.code}" registered successfully!`,
+      type: 'success',
+    });
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  const handleEditSuccess = (updatedProduct: ProductResponse) => {
+    setNotification({
+      message: `Product SKU "${updatedProduct.code}" updated successfully!`,
+      type: 'success',
+    });
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      {/* Header Section */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
-        <div style={{
-          width: '50px',
-          height: '50px',
-          borderRadius: 'var(--radius-md)',
-          background: 'rgba(99, 102, 241, 0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--accent-primary)',
-          border: '1px solid rgba(99, 102, 241, 0.2)'
-        }}
-        className="brand-logo"
+    <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* Toast Notification */}
+      {notification && (
+        <div
+          className="glass-card animate-slide-down"
+          style={{
+            borderColor: 'rgba(16, 185, 129, 0.3)',
+            background: 'rgba(16, 185, 129, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '1rem 1.25rem',
+            borderRadius: '8px',
+          }}
         >
-          <Package size={24} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <CheckCircle size={20} style={{ color: '#10b981' }} />
+            <span style={{ color: 'var(--text-primary, #f8fafc)', fontSize: '0.9rem', fontWeight: 600 }}>
+              {notification.message}
+            </span>
+          </div>
+          <button
+            onClick={() => setNotification(null)}
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary, #94a3b8)', cursor: 'pointer' }}
+          >
+            <X size={18} />
+          </button>
         </div>
-        <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Product Catalog</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-            Register and configure inventory assets for automated supply-chain demand forecasting.
-          </p>
-        </div>
-      </div>
+      )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem', alignItems: 'start' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
-          <div className="glass-card">
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>Register Product Identity</span>
-            </h3>
+      {/* Main Catalog Data Table Component */}
+      <ProductCatalogTable
+        key={refreshTrigger}
+        onEditProduct={handleEditProduct}
+        onOpenRegisterModal={() => setIsRegisterModalOpen(true)}
+        canEdit={canEdit}
+      />
+
+      {/* Registration Modal Dialog */}
+      {isRegisterModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 50,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(15, 23, 42, 0.7)',
+            backdropFilter: 'blur(5px)',
+            padding: '1rem',
+          }}
+          className="animate-fade-in"
+        >
+          <div
+            className="glass-card"
+            style={{
+              width: '100%',
+              maxWidth: '560px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              padding: '1.75rem',
+              position: 'relative',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.25rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Package size={20} style={{ color: 'var(--accent-primary, #6366f1)' }} />
+                <span>Register Product Identity</span>
+              </h3>
+              <button
+                onClick={() => setIsRegisterModalOpen(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary, #94a3b8)', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
             <ProductRegistrationForm onSuccess={handleRegisterSuccess} />
           </div>
         </div>
+      )}
 
-        {/* Success Details Block */}
-        {lastRegisteredProduct && (
-          <div 
-            className="glass-card animate-slide-down" 
-            style={{ 
-              maxWidth: '600px',
-              margin: '0 auto',
-              width: '100%',
-              borderColor: 'rgba(16, 185, 129, 0.3)',
-              background: 'rgba(16, 185, 129, 0.05)',
-              display: 'flex',
-              gap: '1rem',
-              padding: '1.5rem'
-            }}
-          >
-            <Circle size={24} style={{ fill: 'var(--success)', color: 'var(--success)', flexShrink: 0 }} />
-            <div>
-              <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Catalog Entry Created</h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
-                Product code <strong>{lastRegisteredProduct.code}</strong> has been successfully registered. 
-                Description: <em>{lastRegisteredProduct.description}</em>. 
-                Audit ledger transaction verified.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Catalog Help Block */}
-        <div 
-          style={{ 
-            maxWidth: '600px',
-            margin: '0 auto',
-            width: '100%',
-            display: 'flex', 
-            gap: '0.75rem', 
-            padding: '1.25rem',
-            borderRadius: 'var(--radius-md)',
-            background: 'rgba(99, 102, 241, 0.05)',
-            border: '1px solid rgba(99, 102, 241, 0.15)'
-          }}
-        >
-          <HelpCircle size={20} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.5 }}>
-            <strong>Catalog Guidelines:</strong> Enforce unique code structures. The exworks price
-            and quantity values must be formatted precisely. These values are used reactively in 
-            subsequent average lead-time math.
-          </p>
-        </div>
-      </div>
+      {/* Edit Product Slide-Over Panel */}
+      <EditProductSlideOver
+        product={editingProduct}
+        isOpen={isEditDrawerOpen}
+        onClose={() => setIsEditDrawerOpen(false)}
+        onSuccess={handleEditSuccess}
+        canEdit={canEdit}
+      />
     </div>
   );
 };
