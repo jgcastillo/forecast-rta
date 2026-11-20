@@ -45,6 +45,14 @@ def register_product(
             existing_product.exworks_price = product_in.exworks_price
             existing_product.series = product_in.series
             existing_product.shipping_route = product_in.shipping_route
+            if product_in.mps_per_box is not None:
+                existing_product.mps_per_box = product_in.mps_per_box
+            if product_in.category_type is not None:
+                existing_product.category_type = product_in.category_type
+            if product_in.press_model is not None:
+                existing_product.press_model = product_in.press_model
+            if product_in.notes is not None:
+                existing_product.notes = product_in.notes
             existing_product.is_active = True
             
             session.add(existing_product)
@@ -76,6 +84,10 @@ def register_product(
         exworks_price=product_in.exworks_price,
         series=product_in.series,
         shipping_route=product_in.shipping_route,
+        mps_per_box=product_in.mps_per_box,
+        category_type=product_in.category_type,
+        press_model=product_in.press_model,
+        notes=product_in.notes,
         is_active=True
     )
     session.add(new_product)

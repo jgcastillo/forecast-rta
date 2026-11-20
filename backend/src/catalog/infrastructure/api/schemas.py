@@ -9,10 +9,14 @@ from catalog.domain.models import ProductBase
 class ProductCreate(SQLModel):
     code: str
     description: str
-    qty_per_box: int = Field(gt=0)
-    exworks_price: Decimal = Field(ge=0, max_digits=10, decimal_places=2)
+    qty_per_box: int = Field(default=1, gt=0)
+    exworks_price: Decimal = Field(default=Decimal("0.00"), ge=0, max_digits=10, decimal_places=2)
     series: str
-    shipping_route: str
+    shipping_route: str = Field(default="Marítimo")
+    mps_per_box: Optional[int] = Field(default=None, gt=0)
+    category_type: Optional[str] = None
+    press_model: Optional[str] = None
+    notes: Optional[str] = None
 
     @field_validator("code", "description", "series", "shipping_route")
     @classmethod
@@ -22,6 +26,14 @@ class ProductCreate(SQLModel):
             raise ValueError("Field cannot be empty or only spaces")
         return trimmed
 
+    @field_validator("category_type", "press_model", "notes")
+    @classmethod
+    def validate_optional_strings(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            trimmed = v.strip()
+            return trimmed if trimmed else None
+        return v
+
 class ProductUpdate(SQLModel):
     code: Optional[str] = None
     description: Optional[str] = None
@@ -29,6 +41,10 @@ class ProductUpdate(SQLModel):
     exworks_price: Optional[Decimal] = Field(default=None, ge=0, max_digits=10, decimal_places=2)
     series: Optional[str] = None
     shipping_route: Optional[str] = None
+    mps_per_box: Optional[int] = Field(default=None, gt=0)
+    category_type: Optional[str] = None
+    press_model: Optional[str] = None
+    notes: Optional[str] = None
     is_active: Optional[bool] = None
 
     @field_validator("code", "description", "series", "shipping_route")
@@ -39,6 +55,14 @@ class ProductUpdate(SQLModel):
             if not trimmed:
                 raise ValueError("Field cannot be empty or only spaces")
             return trimmed
+        return v
+
+    @field_validator("category_type", "press_model", "notes")
+    @classmethod
+    def validate_optional_strings(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            trimmed = v.strip()
+            return trimmed if trimmed else None
         return v
 
 class ProductFilterParams(SQLModel):
@@ -54,6 +78,7 @@ class ProductFilterParams(SQLModel):
 class ProductResponse(ProductBase):
     id: UUID
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
     @field_serializer("exworks_price")
     def serialize_price(self, price: Decimal) -> str:

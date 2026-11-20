@@ -11,7 +11,7 @@
 
 **Purpose**: Confirm pristine test baseline before any code modifications.
 
-- [ ] T072 Execute the existing test baseline (`pytest backend/tests` and `npm test` in `frontend/`) to verify that all 42 backend tests and 12 frontend tests are passing 100% in green prior to writing any new code.
+- [x] T072 Execute the existing test baseline (`pytest backend/tests` and `npm test` in `frontend/`) to verify that all backend tests (55 tests) and frontend tests (18 tests) are passing 100% in green prior to writing any new code.
 
 ---
 
@@ -20,13 +20,13 @@
 **Goal**: Extend the `Product` entity with real operational attributes (`mps_per_box`, `category_type`, `press_model`, `notes`, `updated_at`, check constraints) and execute the Alembic schema migration, ensuring 100% backward compatibility with US-05.
 
 ### Tests for User Story 1 (Write first, ensure FAIL) ⚠️
-- [ ] T073 [P] [US1] Write failing unit/integration tests in `backend/tests/catalog/test_product_domain_extended.py` verifying new field assignments, check constraints (`mps_per_box > 0`, `shipping_route in ('Marítimo', 'Aéreo')`), and that omitting optional fields maintains backward compatibility.
+- [x] T073 [P] [US1] Write failing unit/integration tests in `backend/tests/catalog/test_product_domain_extended.py` verifying new field assignments, check constraints (`mps_per_box > 0`, `shipping_route in ('Marítimo', 'Aéreo')`), and that omitting optional fields maintains backward compatibility. (Confirmed failing 6/7 tests for expected reasons: missing attributes and constraints).
 
 ### Implementation for User Story 1
-- [ ] T074 [US1] Update `ProductBase` and `Product` models in `backend/src/catalog/domain/models.py` with extended fields, check constraints, and default values per `data_model.md`.
-- [ ] T075 [US1] Update `ProductResponse` output schema in `backend/src/catalog/infrastructure/api/schemas.py` to serialize extended attributes.
-- [ ] T076 [US1] Generate and apply the forward/backward Alembic migration script in `backend/migrations/versions/` for the table evolution.
-- [ ] T077 [US1] Run existing test `backend/tests/catalog/test_register_product.py` and new `test_product_domain_extended.py` to confirm tests pass with zero regressions on US-05.
+- [x] T074 [US1] Update `ProductBase` and `Product` models in `backend/src/catalog/domain/models.py` with extended fields, check constraints, and default values per `data_model.md`.
+- [x] T075 [US1] Update `ProductResponse` output schema in `backend/src/catalog/infrastructure/api/schemas.py` to serialize extended attributes.
+- [x] T076 [US1] Generate and apply the forward/backward Alembic migration script in `backend/migrations/versions/` for the table evolution (`6483685c7578_extend_products_table_us05a.py`).
+- [x] T077 [US1] Run existing test `backend/tests/catalog/test_register_product.py` and new `test_product_domain_extended.py` to confirm tests pass with zero regressions on US-05 (62/62 backend tests passing, 18/18 frontend tests passing).
 
 **Checkpoint**: User Story 1 complete. Database and domain model now support all real product characteristics.
 

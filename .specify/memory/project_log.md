@@ -45,12 +45,16 @@
 - **SSOT Data Model Specification**: Authored `.specify/modules/02_catalog/US05_a_data_model/data_model.md` defining the complete schema evolution for `Product`, SQLModel mapping, PostgreSQL check constraints, and ETL transformation rules.
 - **Feature Specification**: Authored `.specify/modules/02_catalog/US05_a_data_model/spec.md` formalizing User Stories (P1: Entity evolution, P2: Normalization service, P3: Idempotent seeding CLI), edge cases, functional requirements, and measurable success criteria under Elite SDD methodology.
 - **Implementation Plan**: Authored and updated `.specify/modules/02_catalog/US05_a_data_model/plan.md` defining the 4-phase execution roadmap, hexagonal layout (Domain/Application/Infrastructure), standard-library Excel extraction engine, and strict regression protocol (zero modification of legacy tests without explicit prior user approval). Approved by user.
-- **TDD Tasks Breakdown**: Authored `.specify/modules/02_catalog/US05_a_data_model/tasks.md` detailing atomic TDD tasks (T072 to T090) organized by User Story and Phase with strict regression gates.
-- **Governance**: Zero code modifications performed pending user review and formal approval of `tasks.md`.
+- **TDD Tasks Breakdown**: Authored `.specify/modules/02_catalog/US05_a_data_model/tasks.md` detailing atomic TDD tasks (T072 to T090) organized by User Story and Phase with strict regression gates. Approved by user.
+- **Branch & Baseline Verification (T072)**: Switched to dedicated branch `new_data_model` and verified pristine baseline: 55/55 backend tests and 18/18 frontend tests passing in green.
+- **Red Phase TDD Test Suite (T073)**: Authored `backend/tests/catalog/test_product_domain_extended.py` with 7 tests for extended attributes (`mps_per_box`, `category_type`, `press_model`, `notes`, `updated_at`), database persistence, check constraints (`mps_per_box > 0`, `shipping_route in ('Marítimo', 'Aéreo')`), and backward compatibility. Executed tests and confirmed expected failures (6 failed, 1 passed).
+- **Domain Model Evolution (T074)**: Updated `ProductBase` and `Product` models in `backend/src/catalog/domain/models.py` adding `mps_per_box`, `category_type`, `press_model`, `notes`, `updated_at`, and database check constraints (`check_mps_per_box_positive`, `check_shipping_route_valid`).
+- **API Schemas & Routes (T075)**: Updated `ProductCreate`, `ProductUpdate`, and `ProductResponse` in `backend/src/catalog/infrastructure/api/schemas.py`, and updated endpoint routes in `backend/src/catalog/infrastructure/api/routes.py` to accept, persist, and return the extended operational attributes.
+- **Database Migration Applied (T076)**: Generated, reviewed, and applied Alembic migration `6483685c7578_extend_products_table_us05a.py` adding the 5 columns and check constraints to table `products` in PostgreSQL without altering or dropping other tables.
+- **Regression Suite Verification (T077)**: Executed the full backend suite (62/62 tests passing in 22.33s) and frontend suite (18/18 tests passing in 8.03s), confirming 100% green status across all new and pre-existing tests with zero regressions.
 
 ### Next Steps:
-- Await user approval on `tasks.md`.
-- Execute implementation following strict TDD order starting with baseline test verification (T072).
+- Await user approval to proceed with Phase 3 (User Story 2: Excel extraction and normalization engine, T078-T082).
 ## [2026-08-06] - Catalog Management (US-06 & US-07) Full API & UI Implementation
 
 **Status**: 100% COMPLETE (All Backend, Frontend, and Test phases verified).
